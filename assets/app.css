@@ -30,6 +30,11 @@ aside{background:var(--side);color:#fff;padding:22px 15px;position:sticky;top:0;
 .nav button,.nav a{border:0;background:transparent;color:#b6bcc6;text-align:left;border-radius:10px;padding:10px 12px;display:flex;justify-content:space-between;align-items:center;cursor:pointer;text-decoration:none;font-size:13.5px}
 .nav button.active,.nav button:hover,.nav a:hover{background:#1c1f27;color:#fff}
 .nav b{background:#2b2f39;border-radius:999px;padding:2px 8px;font-size:11px;font-weight:600}
+.side-stats{display:grid;gap:8px;margin-top:18px}
+.side-stat{background:#1c1f27;border-radius:10px;padding:10px 12px;display:flex;justify-content:space-between;align-items:center}
+.side-stat span{color:#9199a5;font-size:12px}
+.side-stat strong{font-size:16px;font-weight:700;color:#fff}
+.side-stat.alert strong{color:#f87171}
 .versionbox{margin-top:auto;padding-top:14px;border-top:1px solid var(--side-line);color:#767c88;font-size:11px;line-height:1.6}
 .versionbox strong{color:#fff}
 
@@ -47,14 +52,6 @@ main{padding:26px 34px 60px;max-width:1650px;width:100%;margin:auto}
 .panel .sub{color:var(--muted);font-size:12.5px;margin:0 0 14px}
 .sync-row{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
 .sync-row .status-line{display:flex;align-items:center;gap:10px;font-size:13px}
-
-.stats{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin:16px 0}
-.stat{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:16px;box-shadow:var(--shadow)}
-.stat span{display:block;color:var(--muted);font-size:12px}
-.stat strong{display:block;font-size:26px;margin:6px 0;font-weight:700}
-.stat small{display:block;color:var(--muted);font-size:11.5px}
-.stat.alert strong{color:var(--danger)}
-.stat a{text-decoration:none}
 
 .finance{display:grid;grid-template-columns:1.1fr 2fr;gap:12px;margin-bottom:16px}
 .annual,.monthly{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:16px;box-shadow:var(--shadow)}
@@ -113,7 +110,7 @@ main{padding:26px 34px 60px;max-width:1650px;width:100%;margin:auto}
   aside{height:auto;position:relative}
   .nav{grid-template-columns:repeat(2,1fr)}
   main{padding:18px 14px}
-  .stats{grid-template-columns:repeat(2,1fr)}
+  .side-stats{grid-template-columns:repeat(2,1fr)}
   .finance{grid-template-columns:1fr}
   .top{flex-direction:column}
   .toolbar{grid-template-columns:1fr}

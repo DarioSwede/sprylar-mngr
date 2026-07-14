@@ -163,6 +163,14 @@ function renderApp() {
         ${[["unanswered", "Obesvarade", c.unanswered], ["shipping", "Frakthandlingar", c.shipping], ["paid", "Betalt", c.paid], ["sold", "Sålt / väntar", c.sold], ["receipt", "Inlämningskvitton", c.receipt], ["message", "Meddelanden", c.message]]
           .map(x => `<button data-f="${x[0]}" class="${state.filter === x[0] ? "active" : ""}">${x[1]} <b>${x[2]}</b></button>`).join("")}
       </div>
+      <div class="side-stats">
+        <div class="side-stat"><span>Totalt antal mejl</span><strong>${c.all}</strong></div>
+        <div class="side-stat alert"><span>Olästa</span><strong>${c.unread}</strong></div>
+        <div class="side-stat alert"><span>Obesvarade</span><strong>${c.unanswered}</strong></div>
+        <div class="side-stat"><span>Order</span><strong>${Object.keys(groups()).length}</strong></div>
+        <div class="side-stat"><span>Frakthandlingar</span><strong>${c.shipping}</strong></div>
+        <div class="side-stat"><span>Inlämnade</span><strong>${c.receipt}</strong></div>
+      </div>
       <div class="versionbox"><strong>Sprylar Manager</strong><br>Statisk webbversion<br>Synkas via GitHub Actions</div>
     </aside>
     <main>
@@ -178,15 +186,6 @@ function renderApp() {
           <div class="status-line"><span class="dot"></span> Senast synkad: <strong id="last-sync-text">${timeAgo(state.lastSync)}</strong></div>
           <button id="refresh-btn" class="open" style="border:1px solid var(--line);border-radius:10px;padding:8px 14px;background:var(--panel);cursor:pointer">Kontrollera nu</button>
         </div>
-      </section>
-
-      <section class="stats">
-        <article class="stat"><span>Totalt antal mejl</span><a href="https://mail.google.com/mail/u/0/#inbox" target="_blank"><strong>${c.all}</strong></a><small>inklusive lästa</small></article>
-        <article class="stat alert"><span>Olästa</span><a href="https://mail.google.com/mail/u/0/#search/is%3Aunread+in%3Ainbox" target="_blank"><strong>${c.unread}</strong></a><small>öppna i Gmail</small></article>
-        <article class="stat alert"><span>Obesvarade</span><strong>${c.unanswered}</strong><small>köparmeddelanden</small></article>
-        <article class="stat"><span>Order</span><strong>${Object.keys(groups()).length}</strong><small>unika affärer</small></article>
-        <article class="stat"><span>Frakthandlingar</span><strong>${c.shipping}</strong><small>fraktmejl</small></article>
-        <article class="stat"><span>Inlämnade</span><strong>${c.receipt}</strong><small>kvitton</small></article>
       </section>
 
       <section class="finance">
