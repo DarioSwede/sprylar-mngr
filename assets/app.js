@@ -3,17 +3,14 @@
 // (se .github/workflows/sync.yml + scripts/sync_gmail.py), och den här
 // filen hämtar/dekrypterar/ritar upp den helt i webbläsaren.
 
-const DATA_URL = "data/store.enc.json";
+const DATA_URL = "data/store.json";
 const POLL_MS = 60000; // kolla efter ny (redan synkad) data en gång i minuten
-const REMEMBER_KEY = "sprylar.rememberedPassword";
 
 const L = { paid: "Betalt", sold: "Sålt / väntar", receipt: "Inlämningskvitto", message: "Meddelande", shipping: "Frakthandling", invoice: "Faktura", other: "Övrigt" };
 const I = { paid: "✓", sold: "◷", receipt: "▣", message: "✉", shipping: "↗", invoice: "kr", other: "•" };
 const MONTHS = ["januari", "februari", "mars", "april", "maj", "juni", "juli", "augusti", "september", "oktober", "november", "december"];
 
 let state = {
-  locked: true,
-  password: "",
   emails: [],
   lastSync: 0,
   filter: "all",
@@ -110,51 +107,22 @@ function timeAgo(ts) {
   return `${h} tim sedan`;
 }
 
-// ---------- lock screen ----------
-function renderLock(message) {
-  document.querySelector("#app").innerHTML = `
-    <div class="lock-wrap">
-      <div class="lock-card">
-        <div class="logo">S</div>
-        <h1>Sprylar Manager</h1>
-        <p>Ange lösenordet för att låsa upp din försäljningsdata.</p>
-        <input id="pw" type="password" placeholder="Lösenord" autofocus>
-        <label class="remember"><input id="remember" type="checkbox"> Kom ihåg mig på den här enheten</label>
-        <button class="primary" id="unlock">Lås upp</button>
-        <div class="err">${message || ""}</div>
-        <div class="hint">Data hämtas krypterad från <code>${DATA_URL}</code> och dekrypteras helt lokalt i din webbläsare. Lösenordet skickas aldrig någonstans.</div>
-      </div>
-    </div>`;
-  const pw = document.querySelector("#pw");
-  const go = () => tryUnlock(pw.value, document.querySelector("#remember").checked);
-  document.querySelector("#unlock").onclick = go;
-  pw.addEventListener("keydown", e => { if (e.key === "Enter") go(); });
-}
-
-async function tryUnlock(password, remember) {
-  if (!password) return;
+// ---------- laddning ----------
+async function loadData() {
   try {
     const res = await fetch(`${DATA_URL}?t=${Date.now()}`, { cache: "no-store" });
-    if (!res.ok) { renderLock("Hittar ingen data ännu — har GitHub Action-synken kört minst en gång?"); return; }
-    const blob = await res.json();
-    const payload = await decryptStore(blob, password);
-    state.password = password;
+    if (!res.ok) {
+      document.querySelector("#app").innerHTML = `<div style="padding:30px">Hittar ingen data ännu — har GitHub Action-synken kört minst en gång?</div>`;
+      return;
+    }
+    const payload = await res.json();
     state.emails = (payload.emails || []).map(norm);
     state.lastSync = payload.last_sync || 0;
-    state.locked = false;
-    if (remember) localStorage.setItem(REMEMBER_KEY, password);
     renderApp();
     startPolling();
   } catch (e) {
-    renderLock("Fel lösenord, eller så är datan skadad.");
+    document.querySelector("#app").innerHTML = `<div style="padding:30px">Kunde inte läsa data/store.json.</div>`;
   }
-}
-
-function lockScreen() {
-  stopPolling();
-  state = { ...state, locked: true, password: "", emails: [] };
-  localStorage.removeItem(REMEMBER_KEY);
-  renderLock("");
 }
 
 // ---------- polling (upptäck ny data som Action:en committat) ----------
@@ -167,12 +135,10 @@ function stopPolling() {
   state.pollHandle = null;
 }
 async function checkForUpdate() {
-  if (state.locked) return;
   try {
     const res = await fetch(`${DATA_URL}?t=${Date.now()}`, { cache: "no-store" });
     if (!res.ok) return;
-    const blob = await res.json();
-    const payload = await decryptStore(blob, state.password);
+    const payload = await res.json();
     if ((payload.last_sync || 0) !== state.lastSync) {
       state.emails = (payload.emails || []).map(norm);
       state.lastSync = payload.last_sync || 0;
@@ -196,9 +162,6 @@ function renderApp() {
         <a href="https://mail.google.com/mail/u/0/#search/is%3Aunread+in%3Ainbox" target="_blank">Olästa <b>${c.unread}</b></a>
         ${[["unanswered", "Obesvarade", c.unanswered], ["shipping", "Frakthandlingar", c.shipping], ["paid", "Betalt", c.paid], ["sold", "Sålt / väntar", c.sold], ["receipt", "Inlämningskvitton", c.receipt], ["message", "Meddelanden", c.message]]
           .map(x => `<button data-f="${x[0]}" class="${state.filter === x[0] ? "active" : ""}">${x[1]} <b>${x[2]}</b></button>`).join("")}
-      </div>
-      <div class="side-actions">
-        <button id="lock-btn">Lås</button>
       </div>
       <div class="versionbox"><strong>Sprylar Manager</strong><br>Statisk webbversion<br>Synkas via GitHub Actions</div>
     </aside>
@@ -322,17 +285,8 @@ function bind() {
   document.querySelectorAll("[data-v]").forEach(b => b.onclick = () => { state.view = b.dataset.v; renderApp(); });
   document.querySelector("#q").oninput = draw;
   document.querySelector("#sort").onchange = draw;
-  document.querySelector("#lock-btn").onclick = lockScreen;
   document.querySelector("#refresh-btn").onclick = () => checkForUpdate();
 }
 
 // ---------- boot ----------
-(function boot() {
-  const remembered = localStorage.getItem(REMEMBER_KEY);
-  if (remembered) {
-    renderLock("Låser upp med sparat lösenord…");
-    tryUnlock(remembered, true);
-  } else {
-    renderLock("");
-  }
-})();
+loadData();

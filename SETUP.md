@@ -30,16 +30,14 @@ synken skulle då sluta fungera tyst i bakgrunden.
 ## 3. Lägg till secrets
 
 Repo → **Settings → Secrets and variables → Actions → New repository secret**.
-Lägg till fyra secrets. Värdena för de tre första finns i
-`SECRETS_TO_COPY.txt` (skapad lokalt åt dig, committas aldrig — radera
-filen när du är klar):
+Lägg till tre secrets. Värdena finns i `SECRETS_TO_COPY.txt` (skapad
+lokalt åt dig, committas aldrig — radera filen när du är klar):
 
 | Namn | Värde |
 |---|---|
 | `GMAIL_CLIENT_ID` | från `SECRETS_TO_COPY.txt` |
 | `GMAIL_CLIENT_SECRET` | från `SECRETS_TO_COPY.txt` |
 | `GMAIL_REFRESH_TOKEN` | från `SECRETS_TO_COPY.txt` |
-| `ENCRYPTION_PASSWORD` | **välj ett eget lösenord** — det du senare skriver in på sidan. Finns ingen återställning om du glömmer det; du får då köra en ny full synk med ett nytt lösenord. |
 
 ## 4. Aktivera GitHub Pages
 
@@ -55,8 +53,8 @@ någon minut.
 
 ## 6. Öppna sidan
 
-Din sida ligger på `https://<ditt-användarnamn>.github.io/sprylar-manager/`.
-Ange lösenordet du satte som `ENCRYPTION_PASSWORD` i steg 3.
+Din sida ligger på `https://<ditt-användarnamn>.github.io/sprylar-manager/`
+och är öppen direkt utan lösenord.
 
 ## Efteråt
 
@@ -64,7 +62,3 @@ Ange lösenordet du satte som `ENCRYPTION_PASSWORD` i steg 3.
 - De gamla lokala filerna `credentials.json`, `token.json` och `Old/`-mappen
   behövs inte längre för webbversionen — låt dem ligga kvar lokalt (utanför
   git) om du vill kunna felsöka, men de ska aldrig committas.
-- Vill du byta lösenord senare: uppdatera `ENCRYPTION_PASSWORD`-secreten och
-  kör workflowet manuellt en gång — skriptet märker att det inte längre kan
-  dekryptera gamla `store.enc.json` och gör automatiskt en ny full synk med
-  det nya lösenordet.

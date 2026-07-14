@@ -25,19 +25,18 @@ jobs:
       - name: Installera beroenden
         run: pip install -r scripts/requirements.txt
 
-      - name: Synka och kryptera
+      - name: Synka
         run: python scripts/sync_gmail.py
         env:
           GMAIL_CLIENT_ID: ${{ secrets.GMAIL_CLIENT_ID }}
           GMAIL_CLIENT_SECRET: ${{ secrets.GMAIL_CLIENT_SECRET }}
           GMAIL_REFRESH_TOKEN: ${{ secrets.GMAIL_REFRESH_TOKEN }}
-          ENCRYPTION_PASSWORD: ${{ secrets.ENCRYPTION_PASSWORD }}
 
       - name: Committa uppdaterad data
         run: |
           git config user.name "sprylar-bot"
           git config user.email "actions@users.noreply.github.com"
-          git add data/store.enc.json
+          git add data/store.json
           if git diff --cached --quiet; then
             echo "Inga ändringar att committa."
           else

@@ -3,14 +3,12 @@
 
 Hämtar nya/nyligen aktiva mejl från Gmail (read-only), kategoriserar
 och tolkar dem (order, köpare, belopp, frakt, QR-kod), och sparar en
-krypterad ögonblicksbild i data/store.enc.json som frontend läser och
-låser upp med lösenord i webbläsaren.
+ögonblicksbild i data/store.json som frontend läser direkt.
 
 Miljövariabler (sätts som GitHub Actions-secrets, se SETUP.md):
   GMAIL_CLIENT_ID
   GMAIL_CLIENT_SECRET
   GMAIL_REFRESH_TOKEN
-  ENCRYPTION_PASSWORD
   RECENT_LIMIT (valfri, default 150)
 """
 from __future__ import annotations
@@ -31,12 +29,11 @@ from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from crypto_utils import decrypt_json, encrypt_json  # noqa: E402
 from shipping_parser import choose_qr_image, parse_shipping_fields  # noqa: E402
 
 SCOPES = ["https://www.googleapis.com/auth/gmail.readonly"]
 BASE = Path(__file__).resolve().parent.parent
-STORE = BASE / "data" / "store.enc.json"
+STORE = BASE / "data" / "store.json"
 RECENT_LIMIT = int(os.environ.get("RECENT_LIMIT", "150"))
 
 
@@ -261,7 +258,6 @@ def list_message_ids(service, limit):
 
 
 def main():
-    password = env("ENCRYPTION_PASSWORD")
     service = build("gmail", "v1", credentials=load_credentials(), cache_discovery=False)
     account = service.users().getProfile(userId="me").execute().get("emailAddress", "")
     print(f"Ansluten till {account}")
@@ -269,9 +265,9 @@ def main():
     store = {"emails": [], "last_sync": 0}
     if STORE.exists():
         try:
-            store = decrypt_json(json.loads(STORE.read_text(encoding="utf-8")), password)
+            store = json.loads(STORE.read_text(encoding="utf-8"))
         except Exception as e:
-            print(f"Kunde inte läsa/dekryptera befintlig store ({e}). Kör full synk.")
+            print(f"Kunde inte läsa befintlig store ({e}). Kör full synk.")
             store = {"emails": [], "last_sync": 0}
 
     by_id = {e["id"]: e for e in store.get("emails", [])}
@@ -294,10 +290,10 @@ def main():
     store = {"emails": list(by_id.values()), "last_sync": int(time.time())}
     STORE.parent.mkdir(parents=True, exist_ok=True)
     STORE.write_text(
-        json.dumps(encrypt_json(store, password), ensure_ascii=False, indent=2),
+        json.dumps(store, ensure_ascii=False, indent=2),
         encoding="utf-8",
     )
-    print(f"Klart: {updated} mejl uppdaterade, {len(store['emails'])} totalt i store.enc.json.")
+    print(f"Klart: {updated} mejl uppdaterade, {len(store['emails'])} totalt i store.json.")
 
 
 if __name__ == "__main__":
