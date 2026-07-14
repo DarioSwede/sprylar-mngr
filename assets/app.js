@@ -5,6 +5,7 @@
 
 const DATA_URL = "data/store.json";
 const POLL_MS = 60000; // kolla efter ny (redan synkad) data en gång i minuten
+const THEME_KEY = "sprylar.theme";
 
 const L = { paid: "Betalt", sold: "Sålt / väntar", receipt: "Inlämningskvitto", message: "Meddelande", shipping: "Frakthandling", invoice: "Faktura", other: "Övrigt" };
 const I = { paid: "✓", sold: "◷", receipt: "▣", message: "✉", shipping: "↗", invoice: "kr", other: "•" };
@@ -142,6 +143,18 @@ function timeAgo(ts) {
   return `${h} tim sedan`;
 }
 
+// ---------- tema ----------
+function applyTheme(pref) {
+  const root = document.documentElement;
+  if (pref === "dark" || pref === "light") root.setAttribute("data-theme", pref);
+  else root.removeAttribute("data-theme");
+}
+function setTheme(pref) {
+  localStorage.setItem(THEME_KEY, pref);
+  applyTheme(pref);
+}
+applyTheme(localStorage.getItem(THEME_KEY) || "system");
+
 // ---------- synk-indikator (topplinje) ----------
 function showSyncBar() { document.querySelector("#sync-bar")?.classList.add("active"); }
 function hideSyncBar() { document.querySelector("#sync-bar")?.classList.remove("active"); }
@@ -205,7 +218,7 @@ function renderApp() {
   document.querySelector("#app").innerHTML = `
   <div class="layout">
     <aside>
-      <div class="brand"><div class="logo">S</div><div><strong>Sprylar Manager</strong><small>webb</small></div></div>
+      <div class="brand"><div class="logo">S</div><div><strong>Sprylar Manager</strong><small>webb</small></div><button id="settings-btn" title="Inställningar" aria-label="Inställningar">⚙︎</button></div>
       <div class="nav">
         <a href="https://mail.google.com/mail/u/0/#inbox" target="_blank">Totalt antal mejl <b>${c.all}</b></a>
         <a href="https://mail.google.com/mail/u/0/#search/is%3Aunread+in%3Ainbox" target="_blank">Olästa <b>${c.unread}</b></a>
@@ -306,8 +319,18 @@ function draw() {
     return `<article class="order" data-order="${o}"><div class="ohead">${thumb ? `<img class="thumb" src="${thumb}">` : '<div class="thumb placeholder"></div>'}<div class="otitle"><h3>${title(it)}</h3><div class="meta">${b}${objId ? ` · Obj ${objId}` : ""}</div></div></div><div class="omoney"><span>Varan ${a.sale ? money(a.sale) : "–"}</span><span>Frakt ${a.shipping ? money(a.shipping) : "–"}</span><strong>${a.total ? money(a.total) : "–"}</strong></div>${unread || unans ? `<div class="oflags">${unread ? '<span class="badge red">Oläst</span>' : ""}${unans ? '<span class="badge red">Obesvarat</span>' : ""}</div>` : ""}<a class="open" onclick="event.stopPropagation()" href="${latest.url}" target="_blank">Gmail →</a></article>`;
   };
 
-  const listingCard = (it) => `<article class="order listing" data-listing="${it.id}"><div class="ohead">${it.image ? `<img class="thumb" src="${it.image}">` : '<div class="thumb placeholder"></div>'}<div class="otitle"><h3>${it.title}</h3><div class="meta">Sluttid ${fmtEnd(it.end_date)}</div></div></div><div class="omoney"><span>${it.bids ? `${it.bids} bud` : "Inga bud"}</span><strong>${money(it.price)}</strong></div><a class="open" onclick="event.stopPropagation()" href="${it.url}" target="_blank">Tradera →</a></article>`;
-  const listings = (state.listings || []).filter(it => !q || it.title.toLowerCase().includes(q));
+  const listingCard = (it) => {
+    const priceClass = it.bids > 0 ? "green" : "grey";
+    const bidding = it.bids > 1 ? '<div class="oflags"><span class="badge fire">🔥 Budgivning</span></div>' : "";
+    return `<a class="order listing" href="${it.url}" target="_blank" rel="noopener"><div class="ohead">${it.image ? `<img class="thumb" src="${it.image}">` : '<div class="thumb placeholder"></div>'}<div class="otitle"><h3>${it.title}</h3><div class="meta">Sluttid ${fmtEnd(it.end_date)}</div></div></div><div class="omoney"><span>${it.bids ? `${it.bids} bud` : "Inga bud"}</span><strong class="${priceClass}">${money(it.price)}</strong></div>${bidding}</a>`;
+  };
+  const listings = (state.listings || [])
+    .filter(it => !q || it.title.toLowerCase().includes(q))
+    .sort((a, b) => {
+      const ab = a.bids > 0 ? 1 : 0, bb = b.bids > 0 ? 1 : 0;
+      if (ab !== bb) return bb - ab;
+      return new Date(b.start_date) - new Date(a.start_date);
+    });
 
   el.className = "kanban";
   el.innerHTML = STAGES.map(([key, label]) => {
@@ -355,12 +378,18 @@ function orderDetailHtml(o) {
     ${ship ? `<div class="shipping-grid full"><div class="field"><span>Transportbolag</span><strong>${s.carrier || "Ej identifierat"}</strong></div><div class="field"><span>Närmaste ombud</span><strong>${s.pickup || "Ej identifierat"}</strong></div><div class="field"><span>Spårningsnr.</span><strong>${s.tracking || "Ej identifierat"}</strong></div><div class="field"><span>Sändningsnr.</span><strong>${s.shipment || "Ej identifierat"}</strong></div><div class="field"><span>Tjänst och vikt</span><strong>${[s.service, s.weight].filter(Boolean).join(" · ") || "Ej identifierat"}</strong></div><div class="field"><span>Paketstorlek och mått</span><strong>${[s.size, s.dimensions].filter(Boolean).join(" · ") || "Ej identifierat"}</strong></div></div>${s.qr ? `<img class="qr-full" src="${s.qr}" alt="QR-kod">` : ""}` : `<p class="meta">Ingen frakthandling identifierad ännu.</p>`}
     <a class="open" href="${latest.url}" target="_blank">Öppna i Gmail →</a>`;
 }
-function listingDetailHtml(id) {
-  const it = (state.listings || []).find(x => String(x.id) === String(id));
-  if (!it) return "<p>Annons hittades inte.</p>";
-  return `<div class="modal-head">${it.image ? `<img class="modal-thumb" src="${it.image}">` : ""}<div><h2>${it.title}</h2><div class="meta">Sluttid ${fmtEnd(it.end_date)}</div></div></div>
-    <div class="modal-money"><div><span>${it.bids ? `${it.bids} bud` : "Inga bud"}</span><strong>${money(it.price)}</strong></div></div>
-    <a class="open" href="${it.url}" target="_blank">Öppna på Tradera →</a>`;
+function openSettings() {
+  const cur = localStorage.getItem(THEME_KEY) || "system";
+  openModal(`<h2>Inställningar</h2>
+    <div class="settings-group">
+      <div class="settings-label">Utseende</div>
+      <div class="theme-options">
+        <button data-theme-opt="light" class="${cur === "light" ? "active" : ""}">☀️ Ljust</button>
+        <button data-theme-opt="dark" class="${cur === "dark" ? "active" : ""}">🌙 Mörkt</button>
+        <button data-theme-opt="system" class="${cur === "system" ? "active" : ""}">🖥️ Följ system</button>
+      </div>
+    </div>`);
+  document.querySelectorAll("[data-theme-opt]").forEach(b => b.onclick = () => { setTheme(b.dataset.themeOpt); openSettings(); });
 }
 
 function toast(t) {
@@ -376,11 +405,10 @@ function bind() {
   document.querySelector("#q").oninput = draw;
   document.querySelector("#sort").onchange = draw;
   document.querySelector("#refresh-btn").onclick = () => checkForUpdate();
+  document.querySelector("#settings-btn").onclick = openSettings;
   document.querySelector("#content").onclick = e => {
     const oEl = e.target.closest("[data-order]");
-    if (oEl) { openModal(orderDetailHtml(oEl.dataset.order)); return; }
-    const lEl = e.target.closest("[data-listing]");
-    if (lEl) { openModal(listingDetailHtml(lEl.dataset.listing)); return; }
+    if (oEl) openModal(orderDetailHtml(oEl.dataset.order));
   };
 }
 
