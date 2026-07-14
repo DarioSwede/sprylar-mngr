@@ -98,6 +98,32 @@ function annual(year) {
   });
   return r;
 }
+function years() {
+  const set = new Set();
+  Object.values(groups()).forEach(it => {
+    if (!it.some(e => cat(e) === "paid")) return;
+    const d = paidDate(it);
+    if (!isNaN(d)) set.add(d.getFullYear());
+  });
+  return [...set].sort((a, b) => b - a);
+}
+function amtRows(a) {
+  return `<div class="amt-row"><span>Varor</span><strong>${money(a.sale)}</strong></div><div class="amt-row"><span>Frakt</span><strong>−${money(a.shipping)}</strong></div><div class="amt-row total"><span>Totalt</span><strong>${money(a.total)}</strong></div>`;
+}
+const STAGES = [
+  ["unsold", "Ej sålda"],
+  ["sold", "Sålda"],
+  ["paid", "Betalda"],
+  ["shipping", "Frakthandling"],
+  ["receipt", "Inlämnade"],
+];
+function stage(it) {
+  if (it.some(e => cat(e) === "receipt")) return "receipt";
+  if (it.some(e => cat(e) === "shipping")) return "shipping";
+  if (it.some(e => cat(e) === "paid")) return "paid";
+  if (it.some(e => cat(e) === "sold")) return "sold";
+  return "unsold";
+}
 function timeAgo(ts) {
   if (!ts) return "—";
   const diffMin = Math.round((Date.now() - ts * 1000) / 60000);
@@ -152,7 +178,7 @@ async function checkForUpdate() {
 
 // ---------- app shell ----------
 function renderApp() {
-  const c = counts(), m = monthly(), y = annual(new Date().getFullYear());
+  const c = counts(), m = monthly(), y2 = years();
   document.querySelector("#app").innerHTML = `
   <div class="layout">
     <aside>
@@ -173,32 +199,20 @@ function renderApp() {
       </div>
       <div class="versionbox"><strong>Sprylar Manager</strong><br>Statisk webbversion<br>Synkas via GitHub Actions</div>
     </aside>
+    <aside class="finance-side">
+      <h2>Försäljning</h2>
+      ${y2.length ? y2.map(yr => { const a = annual(yr); return `<div class="fs-card"><h3>${yr}</h3><div class="fs-big">${money(a.sale - a.shipping)}</div>${amtRows(a)}<div class="fs-count">${a.count} betalda order</div></div>`; }).join("") : '<div class="fs-empty">Ingen försäljning ännu.</div>'}
+      <h2>Månadsvis</h2>
+      ${m.length ? m.map(([k, v]) => { const [yr, mo] = k.split("-"); return `<div class="fs-card"><h3>${MONTHS[Number(mo) - 1]} ${yr}</h3><div class="fs-big">${money(v.sale - v.shipping)}</div>${amtRows(v)}<div class="fs-count">${v.count} betalda order</div></div>`; }).join("") : '<div class="fs-empty">Inga belopp identifierade.</div>'}
+    </aside>
     <main>
       <div class="top">
         <div><h1>Försäljningscentral</h1><p>Order, meddelanden, frakt och bokföringsunderlag.</p></div>
-        <div class="sync" id="sync-line"></div>
-      </div>
-
-      <section class="panel">
-        <h2>Synkstatus</h2>
-        <p class="sub">Gmail synkas automatiskt av en GitHub Action var 5:e minut. Den här sidan kollar efter ny data en gång i minuten.</p>
-        <div class="sync-row">
-          <div class="status-line"><span class="dot"></span> Senast synkad: <strong id="last-sync-text">${timeAgo(state.lastSync)}</strong></div>
-          <button id="refresh-btn" class="open" style="border:1px solid var(--line);border-radius:10px;padding:8px 14px;background:var(--panel);cursor:pointer">Kontrollera nu</button>
+        <div class="sync-actions">
+          <div class="sync" id="sync-line"></div>
+          <button id="refresh-btn">Kontrollera nu</button>
         </div>
-      </section>
-
-      <section class="finance">
-        <article class="annual">
-          <h3>Försäljning ${new Date().getFullYear()}</h3>
-          <div class="big">${money(y.sale - y.shipping)}</div>
-          <div class="rows">Netto efter frakt<br>Varor: ${money(y.sale)}<br>Frakt: −${money(y.shipping)}<br>Total debitering: ${money(y.total)}<br>${y.count} betalda order</div>
-        </article>
-        <article class="monthly">
-          <h3>Månadsvis försäljning</h3>
-          <div class="months">${m.length ? m.map(([k, v]) => { const [yr, mo] = k.split("-"); return `<div class="month"><h4>${MONTHS[Number(mo) - 1]} ${yr}</h4><strong>${money(v.sale - v.shipping)}</strong><span>${v.count} order</span><span>Varor ${money(v.sale)}</span><span>Frakt −${money(v.shipping)}</span><span>Total ${money(v.total)}</span></div>`; }).join("") : "<span>Inga belopp identifierade.</span>"}</div>
-        </article>
-      </section>
+      </div>
 
       <div class="tabs">
         <button data-v="mail" class="${state.view === "mail" ? "active" : ""}">Mejl</button>
@@ -219,8 +233,6 @@ function renderApp() {
 function updateSyncLine() {
   const el = document.querySelector("#sync-line");
   if (el) el.innerHTML = `<strong><span class="dot"></span>Senast kontrollerad: ${new Date().toLocaleTimeString("sv-SE")}</strong>Data synkad: ${timeAgo(state.lastSync)}`;
-  const lst = document.querySelector("#last-sync-text");
-  if (lst) lst.textContent = timeAgo(state.lastSync);
 }
 
 function draw() {
@@ -257,9 +269,8 @@ function draw() {
     const db = Math.max(...b[1].map(x => +new Date(x.date) || 0));
     return sort === "old" ? da - db : db - da;
   });
-  el.className = "list";
-  el.innerHTML = arr.map(([o, it]) => {
-    const has = t => it.some(x => cat(x) === t);
+
+  const card = ([o, it]) => {
     const sold = it.find(x => cat(x) === "sold");
     const ship = mergedShipping(it);
     const b = (sold && sold.buyer) || it.find(x => x.buyer)?.buyer || "Ej identifierad";
@@ -268,7 +279,13 @@ function draw() {
     const unread = it.some(e => e.unread);
     const unans = it.some(e => unanswered(e));
     const s = ship || {};
-    return `<article class="order"><div class="orderhead"><div><h3>${title(it)}</h3><div class="meta">Såld till <strong>${b}</strong> · Order ${o}${it.find(x => x.object_id) ? ` · Objekt ${it.find(x => x.object_id).object_id}` : ""} · ${it.length} mejl</div></div><div class="money"><strong>Varan ${a.sale ? money(a.sale) : "saknas"}</strong><span>Frakt ${a.shipping ? money(a.shipping) : "saknas"}</span><span>Total ${a.total ? money(a.total) : "saknas"}</span><a class="open" href="${latest.url}" target="_blank">Gmail →</a></div></div><div class="timeline"><span class="tstep ${has("sold") ? "done" : ""}">Såld</span><span class="tstep ${has("paid") ? "done" : ""}">Betald</span><span class="tstep ${has("shipping") ? "done" : ""}">Frakthandling</span><span class="tstep ${has("receipt") ? "done" : ""}">Inlämnad</span><span class="tstep ${has("message") ? "done" : ""}">Meddelande</span>${unread ? '<span class="tstep alert">Oläst</span>' : ""}${unans ? '<span class="tstep alert">Obesvarat</span>' : ""}</div>${ship ? `<div class="summary"><h4>Ordersummering</h4><div class="shipping"><div class="shipping-grid"><div class="field"><span>Transportbolag</span><strong>${s.carrier || "Ej identifierat"}</strong></div><div class="field"><span>Närmaste ombud</span><strong>${s.pickup || "Ej identifierat"}</strong></div><div class="field"><span>Spårningsnr.</span><strong>${s.tracking || "Ej identifierat"}</strong></div><div class="field"><span>Sändningsnr.</span><strong>${s.shipment || "Ej identifierat"}</strong></div><div class="field"><span>Tjänst och vikt</span><strong>${[s.service, s.weight].filter(Boolean).join(" · ") || "Ej identifierat"}</strong></div><div class="field"><span>Paketstorlek och mått</span><strong>${[s.size, s.dimensions].filter(Boolean).join(" · ") || "Ej identifierat"}</strong></div></div>${s.qr ? `<img class="qr" src="${s.qr}" alt="QR-kod">` : ""}</div></div>` : ""}</article>`;
+    return `<article class="order"><h3>${title(it)}</h3><div class="meta">Köpare <strong>${b}</strong> · #${o}${it.find(x => x.object_id) ? ` · Obj ${it.find(x => x.object_id).object_id}` : ""}</div><div class="omoney"><span>Varan ${a.sale ? money(a.sale) : "–"}</span><span>Frakt ${a.shipping ? money(a.shipping) : "–"}</span><strong>${a.total ? money(a.total) : "–"}</strong></div>${unread || unans ? `<div class="oflags">${unread ? '<span class="badge red">Oläst</span>' : ""}${unans ? '<span class="badge red">Obesvarat</span>' : ""}</div>` : ""}${ship ? `<div class="shipping-grid"><div class="field"><span>Bolag</span><strong title="${s.carrier || ""}">${s.carrier || "–"}</strong></div><div class="field"><span>Ombud</span><strong title="${s.pickup || ""}">${s.pickup || "–"}</strong></div><div class="field"><span>Spårn.</span><strong title="${s.tracking || ""}">${s.tracking || "–"}</strong></div><div class="field"><span>Sändn.</span><strong title="${s.shipment || ""}">${s.shipment || "–"}</strong></div><div class="field"><span>Vikt</span><strong title="${s.weight || ""}">${s.weight || "–"}</strong></div><div class="field"><span>Storlek</span><strong title="${[s.size, s.dimensions].filter(Boolean).join(" · ")}">${s.size || "–"}</strong></div></div>${s.qr ? `<img class="qr" src="${s.qr}" alt="QR-kod">` : ""}` : ""}<a class="open" href="${latest.url}" target="_blank">Gmail →</a></article>`;
+  };
+
+  el.className = "kanban";
+  el.innerHTML = STAGES.map(([key, label]) => {
+    const items = arr.filter(([o, it]) => stage(it) === key);
+    return `<div class="kcol"><div class="kcol-head">${label}<b>${items.length}</b></div>${items.length ? items.map(card).join("") : `<div class="empty">${key === "unsold" ? "Väntar på Tradera-koppling" : "Inga order här"}</div>`}</div>`;
   }).join("") || '<div class="empty">Inga order matchar.</div>';
 }
 
