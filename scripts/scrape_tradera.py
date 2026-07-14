@@ -61,7 +61,7 @@ def simplify(item: dict) -> dict:
         "start_date": item.get("startDate", ""),
         "end_date": item.get("endDate", ""),
         "url": item.get("itemUrl", ""),
-        "image": (item.get("imageUrlTemplate") or "").replace("{format}", "196x196"),
+        "image": (item.get("imageUrlTemplate") or "").replace("{format}", "small-square"),
     }
 
 
@@ -76,8 +76,16 @@ def main():
         except Exception:
             store = {}
 
+    # Bilder sparas permanent per objekt-id, så miniatyren finns kvar även
+    # efter att varan sålts och försvunnit från de aktiva annonserna.
+    images = store.get("item_images", {})
+    for it in listings:
+        if it["image"]:
+            images[str(it["id"])] = it["image"]
+
     store["listings"] = listings
     store["listings_synced_at"] = int(time.time())
+    store["item_images"] = images
 
     STORE.parent.mkdir(parents=True, exist_ok=True)
     STORE.write_text(json.dumps(store, ensure_ascii=False, indent=2), encoding="utf-8")

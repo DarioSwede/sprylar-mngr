@@ -13,6 +13,7 @@ const MONTHS = ["januari", "februari", "mars", "april", "maj", "juni", "juli", "
 let state = {
   emails: [],
   listings: [],
+  itemImages: {},
   lastSync: 0,
   filter: "all",
   view: "orders",
@@ -141,8 +142,13 @@ function timeAgo(ts) {
   return `${h} tim sedan`;
 }
 
+// ---------- synk-indikator (topplinje) ----------
+function showSyncBar() { document.querySelector("#sync-bar")?.classList.add("active"); }
+function hideSyncBar() { document.querySelector("#sync-bar")?.classList.remove("active"); }
+
 // ---------- laddning ----------
 async function loadData() {
+  showSyncBar();
   try {
     const res = await fetch(`${DATA_URL}?t=${Date.now()}`, { cache: "no-store" });
     if (!res.ok) {
@@ -152,11 +158,14 @@ async function loadData() {
     const payload = await res.json();
     state.emails = (payload.emails || []).map(norm);
     state.listings = payload.listings || [];
+    state.itemImages = payload.item_images || {};
     state.lastSync = payload.last_sync || 0;
     renderApp();
     startPolling();
   } catch (e) {
     document.querySelector("#app").innerHTML = `<div style="padding:30px">Kunde inte läsa data/store.json.</div>`;
+  } finally {
+    hideSyncBar();
   }
 }
 
@@ -170,6 +179,7 @@ function stopPolling() {
   state.pollHandle = null;
 }
 async function checkForUpdate() {
+  showSyncBar();
   try {
     const res = await fetch(`${DATA_URL}?t=${Date.now()}`, { cache: "no-store" });
     if (!res.ok) return;
@@ -177,13 +187,16 @@ async function checkForUpdate() {
     if ((payload.last_sync || 0) !== state.lastSync) {
       state.emails = (payload.emails || []).map(norm);
       state.listings = payload.listings || [];
+      state.itemImages = payload.item_images || {};
       state.lastSync = payload.last_sync || 0;
       renderApp();
       toast("Ny data synkad från Gmail");
     } else {
       updateSyncLine();
     }
-  } catch { /* tillfälligt nätverksfel, försök igen nästa gång */ }
+  } catch { /* tillfälligt nätverksfel, försök igen nästa gång */ } finally {
+    hideSyncBar();
+  }
 }
 
 // ---------- app shell ----------
@@ -283,17 +296,17 @@ function draw() {
 
   const card = ([o, it]) => {
     const sold = it.find(x => cat(x) === "sold");
-    const ship = mergedShipping(it);
     const b = (sold && sold.buyer) || it.find(x => x.buyer)?.buyer || "Ej identifierad";
     const latest = [...it].sort((a, b) => new Date(b.date) - new Date(a.date))[0];
     const a = amounts(it);
     const unread = it.some(e => e.unread);
     const unans = it.some(e => unanswered(e));
-    const s = ship || {};
-    return `<article class="order"><h3>${title(it)}</h3><div class="meta">Köpare <strong>${b}</strong> · #${o}${it.find(x => x.object_id) ? ` · Obj ${it.find(x => x.object_id).object_id}` : ""}</div><div class="omoney"><span>Varan ${a.sale ? money(a.sale) : "–"}</span><span>Frakt ${a.shipping ? money(a.shipping) : "–"}</span><strong>${a.total ? money(a.total) : "–"}</strong></div>${unread || unans ? `<div class="oflags">${unread ? '<span class="badge red">Oläst</span>' : ""}${unans ? '<span class="badge red">Obesvarat</span>' : ""}</div>` : ""}${ship ? `<div class="shipping-grid"><div class="field"><span>Bolag</span><strong title="${s.carrier || ""}">${s.carrier || "–"}</strong></div><div class="field"><span>Ombud</span><strong title="${s.pickup || ""}">${s.pickup || "–"}</strong></div><div class="field"><span>Spårn.</span><strong title="${s.tracking || ""}">${s.tracking || "–"}</strong></div><div class="field"><span>Sändn.</span><strong title="${s.shipment || ""}">${s.shipment || "–"}</strong></div><div class="field"><span>Vikt</span><strong title="${s.weight || ""}">${s.weight || "–"}</strong></div><div class="field"><span>Storlek</span><strong title="${[s.size, s.dimensions].filter(Boolean).join(" · ")}">${s.size || "–"}</strong></div></div>${s.qr ? `<img class="qr" src="${s.qr}" alt="QR-kod">` : ""}` : ""}<a class="open" href="${latest.url}" target="_blank">Gmail →</a></article>`;
+    const objId = it.find(x => x.object_id)?.object_id;
+    const thumb = objId && state.itemImages[objId];
+    return `<article class="order" data-order="${o}"><div class="ohead">${thumb ? `<img class="thumb" src="${thumb}">` : '<div class="thumb placeholder"></div>'}<div class="otitle"><h3>${title(it)}</h3><div class="meta">${b}${objId ? ` · Obj ${objId}` : ""}</div></div></div><div class="omoney"><span>Varan ${a.sale ? money(a.sale) : "–"}</span><span>Frakt ${a.shipping ? money(a.shipping) : "–"}</span><strong>${a.total ? money(a.total) : "–"}</strong></div>${unread || unans ? `<div class="oflags">${unread ? '<span class="badge red">Oläst</span>' : ""}${unans ? '<span class="badge red">Obesvarat</span>' : ""}</div>` : ""}<a class="open" onclick="event.stopPropagation()" href="${latest.url}" target="_blank">Gmail →</a></article>`;
   };
 
-  const listingCard = (it) => `<article class="order listing"><h3>${it.title}</h3><div class="meta">Sluttid ${fmtEnd(it.end_date)}</div><div class="omoney"><span>${it.bids ? `${it.bids} bud` : "Inga bud"}</span><strong>${money(it.price)}</strong></div><a class="open" href="${it.url}" target="_blank">Tradera →</a></article>`;
+  const listingCard = (it) => `<article class="order listing" data-listing="${it.id}"><div class="ohead">${it.image ? `<img class="thumb" src="${it.image}">` : '<div class="thumb placeholder"></div>'}<div class="otitle"><h3>${it.title}</h3><div class="meta">Sluttid ${fmtEnd(it.end_date)}</div></div></div><div class="omoney"><span>${it.bids ? `${it.bids} bud` : "Inga bud"}</span><strong>${money(it.price)}</strong></div><a class="open" onclick="event.stopPropagation()" href="${it.url}" target="_blank">Tradera →</a></article>`;
   const listings = (state.listings || []).filter(it => !q || it.title.toLowerCase().includes(q));
 
   el.className = "kanban";
@@ -304,6 +317,50 @@ function draw() {
     const items = arr.filter(([o, it]) => stage(it) === key);
     return `<div class="kcol"><div class="kcol-head">${label}<b>${items.length}</b></div>${items.length ? items.map(card).join("") : '<div class="empty">Inga order här</div>'}</div>`;
   }).join("");
+}
+
+// ---------- detaljmodal ----------
+function ensureModal() {
+  if (document.querySelector("#modal-backdrop")) return;
+  const d = document.createElement("div");
+  d.id = "modal-backdrop";
+  d.className = "modal-backdrop hidden";
+  d.innerHTML = `<div class="modal"><button id="modal-close" aria-label="Stäng">×</button><div id="modal-body"></div></div>`;
+  document.body.appendChild(d);
+  d.addEventListener("click", e => { if (e.target === d) closeModal(); });
+  document.querySelector("#modal-close").onclick = closeModal;
+  document.addEventListener("keydown", e => { if (e.key === "Escape") closeModal(); });
+}
+function openModal(html) {
+  ensureModal();
+  document.querySelector("#modal-body").innerHTML = html;
+  document.querySelector("#modal-backdrop").classList.remove("hidden");
+}
+function closeModal() {
+  document.querySelector("#modal-backdrop")?.classList.add("hidden");
+}
+function orderDetailHtml(o) {
+  const it = groups()[o];
+  if (!it || !it.length) return "<p>Order hittades inte.</p>";
+  const sold = it.find(x => cat(x) === "sold");
+  const ship = mergedShipping(it);
+  const b = (sold && sold.buyer) || it.find(x => x.buyer)?.buyer || "Ej identifierad";
+  const latest = [...it].sort((a, b) => new Date(b.date) - new Date(a.date))[0];
+  const a = amounts(it);
+  const s = ship || {};
+  const objId = it.find(x => x.object_id)?.object_id;
+  const thumb = objId && state.itemImages[objId];
+  return `<div class="modal-head">${thumb ? `<img class="modal-thumb" src="${thumb}">` : ""}<div><h2>${title(it)}</h2><div class="meta">Köpare <strong>${b}</strong> · Order ${o}${objId ? ` · Objekt ${objId}` : ""}</div></div></div>
+    <div class="modal-money"><div><span>Varan</span><strong>${a.sale ? money(a.sale) : "–"}</strong></div><div><span>Frakt</span><strong>${a.shipping ? money(a.shipping) : "–"}</strong></div><div><span>Totalt</span><strong>${a.total ? money(a.total) : "–"}</strong></div></div>
+    ${ship ? `<div class="shipping-grid full"><div class="field"><span>Transportbolag</span><strong>${s.carrier || "Ej identifierat"}</strong></div><div class="field"><span>Närmaste ombud</span><strong>${s.pickup || "Ej identifierat"}</strong></div><div class="field"><span>Spårningsnr.</span><strong>${s.tracking || "Ej identifierat"}</strong></div><div class="field"><span>Sändningsnr.</span><strong>${s.shipment || "Ej identifierat"}</strong></div><div class="field"><span>Tjänst och vikt</span><strong>${[s.service, s.weight].filter(Boolean).join(" · ") || "Ej identifierat"}</strong></div><div class="field"><span>Paketstorlek och mått</span><strong>${[s.size, s.dimensions].filter(Boolean).join(" · ") || "Ej identifierat"}</strong></div></div>${s.qr ? `<img class="qr-full" src="${s.qr}" alt="QR-kod">` : ""}` : `<p class="meta">Ingen frakthandling identifierad ännu.</p>`}
+    <a class="open" href="${latest.url}" target="_blank">Öppna i Gmail →</a>`;
+}
+function listingDetailHtml(id) {
+  const it = (state.listings || []).find(x => String(x.id) === String(id));
+  if (!it) return "<p>Annons hittades inte.</p>";
+  return `<div class="modal-head">${it.image ? `<img class="modal-thumb" src="${it.image}">` : ""}<div><h2>${it.title}</h2><div class="meta">Sluttid ${fmtEnd(it.end_date)}</div></div></div>
+    <div class="modal-money"><div><span>${it.bids ? `${it.bids} bud` : "Inga bud"}</span><strong>${money(it.price)}</strong></div></div>
+    <a class="open" href="${it.url}" target="_blank">Öppna på Tradera →</a>`;
 }
 
 function toast(t) {
@@ -319,6 +376,12 @@ function bind() {
   document.querySelector("#q").oninput = draw;
   document.querySelector("#sort").onchange = draw;
   document.querySelector("#refresh-btn").onclick = () => checkForUpdate();
+  document.querySelector("#content").onclick = e => {
+    const oEl = e.target.closest("[data-order]");
+    if (oEl) { openModal(orderDetailHtml(oEl.dataset.order)); return; }
+    const lEl = e.target.closest("[data-listing]");
+    if (lEl) { openModal(listingDetailHtml(lEl.dataset.listing)); return; }
+  };
 }
 
 // ---------- boot ----------
