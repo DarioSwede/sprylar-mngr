@@ -287,7 +287,8 @@ def main():
         if i % 25 == 0 or i == len(ids_to_fetch):
             print(f"  {i}/{len(ids_to_fetch)}")
 
-    store = {"emails": list(by_id.values()), "last_sync": int(time.time())}
+    store["emails"] = list(by_id.values())
+    store["last_sync"] = int(time.time())
     STORE.parent.mkdir(parents=True, exist_ok=True)
     STORE.write_text(
         json.dumps(store, ensure_ascii=False, indent=2),

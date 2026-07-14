@@ -1,4 +1,4 @@
-name: Synka Gmail
+name: Synka
 
 on:
   schedule:
@@ -25,12 +25,15 @@ jobs:
       - name: Installera beroenden
         run: pip install -r scripts/requirements.txt
 
-      - name: Synka
+      - name: Synka Gmail
         run: python scripts/sync_gmail.py
         env:
           GMAIL_CLIENT_ID: ${{ secrets.GMAIL_CLIENT_ID }}
           GMAIL_CLIENT_SECRET: ${{ secrets.GMAIL_CLIENT_SECRET }}
           GMAIL_REFRESH_TOKEN: ${{ secrets.GMAIL_REFRESH_TOKEN }}
+
+      - name: Skrapa Tradera-profil
+        run: python scripts/scrape_tradera.py
 
       - name: Committa uppdaterad data
         run: |

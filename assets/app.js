@@ -12,6 +12,7 @@ const MONTHS = ["januari", "februari", "mars", "april", "maj", "juni", "juli", "
 
 let state = {
   emails: [],
+  listings: [],
   lastSync: 0,
   filter: "all",
   view: "orders",
@@ -124,6 +125,13 @@ function stage(it) {
   if (it.some(e => cat(e) === "sold")) return "sold";
   return "unsold";
 }
+function fmtEnd(iso) {
+  const d = new Date(iso);
+  if (isNaN(d)) return "";
+  const hh = String(d.getHours()).padStart(2, "0");
+  const mm = String(d.getMinutes()).padStart(2, "0");
+  return `${d.getDate()} ${MONTHS[d.getMonth()].slice(0, 3)} ${hh}:${mm}`;
+}
 function timeAgo(ts) {
   if (!ts) return "—";
   const diffMin = Math.round((Date.now() - ts * 1000) / 60000);
@@ -143,6 +151,7 @@ async function loadData() {
     }
     const payload = await res.json();
     state.emails = (payload.emails || []).map(norm);
+    state.listings = payload.listings || [];
     state.lastSync = payload.last_sync || 0;
     renderApp();
     startPolling();
@@ -167,6 +176,7 @@ async function checkForUpdate() {
     const payload = await res.json();
     if ((payload.last_sync || 0) !== state.lastSync) {
       state.emails = (payload.emails || []).map(norm);
+      state.listings = payload.listings || [];
       state.lastSync = payload.last_sync || 0;
       renderApp();
       toast("Ny data synkad från Gmail");
@@ -190,6 +200,7 @@ function renderApp() {
           .map(x => `<button data-f="${x[0]}" class="${state.filter === x[0] ? "active" : ""}">${x[1]} <b>${x[2]}</b></button>`).join("")}
       </div>
       <div class="side-stats">
+        <div class="side-stat"><span>Aktiva annonser</span><strong>${state.listings.length}</strong></div>
         <div class="side-stat"><span>Totalt antal mejl</span><strong>${c.all}</strong></div>
         <div class="side-stat alert"><span>Olästa</span><strong>${c.unread}</strong></div>
         <div class="side-stat alert"><span>Obesvarade</span><strong>${c.unanswered}</strong></div>
@@ -282,11 +293,17 @@ function draw() {
     return `<article class="order"><h3>${title(it)}</h3><div class="meta">Köpare <strong>${b}</strong> · #${o}${it.find(x => x.object_id) ? ` · Obj ${it.find(x => x.object_id).object_id}` : ""}</div><div class="omoney"><span>Varan ${a.sale ? money(a.sale) : "–"}</span><span>Frakt ${a.shipping ? money(a.shipping) : "–"}</span><strong>${a.total ? money(a.total) : "–"}</strong></div>${unread || unans ? `<div class="oflags">${unread ? '<span class="badge red">Oläst</span>' : ""}${unans ? '<span class="badge red">Obesvarat</span>' : ""}</div>` : ""}${ship ? `<div class="shipping-grid"><div class="field"><span>Bolag</span><strong title="${s.carrier || ""}">${s.carrier || "–"}</strong></div><div class="field"><span>Ombud</span><strong title="${s.pickup || ""}">${s.pickup || "–"}</strong></div><div class="field"><span>Spårn.</span><strong title="${s.tracking || ""}">${s.tracking || "–"}</strong></div><div class="field"><span>Sändn.</span><strong title="${s.shipment || ""}">${s.shipment || "–"}</strong></div><div class="field"><span>Vikt</span><strong title="${s.weight || ""}">${s.weight || "–"}</strong></div><div class="field"><span>Storlek</span><strong title="${[s.size, s.dimensions].filter(Boolean).join(" · ")}">${s.size || "–"}</strong></div></div>${s.qr ? `<img class="qr" src="${s.qr}" alt="QR-kod">` : ""}` : ""}<a class="open" href="${latest.url}" target="_blank">Gmail →</a></article>`;
   };
 
+  const listingCard = (it) => `<article class="order listing"><h3>${it.title}</h3><div class="meta">Sluttid ${fmtEnd(it.end_date)}</div><div class="omoney"><span>${it.bids ? `${it.bids} bud` : "Inga bud"}</span><strong>${money(it.price)}</strong></div><a class="open" href="${it.url}" target="_blank">Tradera →</a></article>`;
+  const listings = (state.listings || []).filter(it => !q || it.title.toLowerCase().includes(q));
+
   el.className = "kanban";
   el.innerHTML = STAGES.map(([key, label]) => {
+    if (key === "unsold") {
+      return `<div class="kcol"><div class="kcol-head">${label}<b>${listings.length}</b></div>${listings.length ? listings.map(listingCard).join("") : '<div class="empty">Inga aktiva annonser</div>'}</div>`;
+    }
     const items = arr.filter(([o, it]) => stage(it) === key);
-    return `<div class="kcol"><div class="kcol-head">${label}<b>${items.length}</b></div>${items.length ? items.map(card).join("") : `<div class="empty">${key === "unsold" ? "Väntar på Tradera-koppling" : "Inga order här"}</div>`}</div>`;
-  }).join("") || '<div class="empty">Inga order matchar.</div>';
+    return `<div class="kcol"><div class="kcol-head">${label}<b>${items.length}</b></div>${items.length ? items.map(card).join("") : '<div class="empty">Inga order här</div>'}</div>`;
+  }).join("");
 }
 
 function toast(t) {

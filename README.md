@@ -1,8 +1,9 @@
 # Sprylar Manager
 
 En försäljningscentral för Tradera: bevakar din Gmail-inkorg, tolkar
-sålt/betalt/frakt/meddelande-mejl automatiskt och visar allt i en snygg
-webbsida — utan att du behöver ha en dator igång.
+sålt/betalt/frakt/meddelande-mejl automatiskt, skrapar din publika
+Tradera-profil för aktiva annonser (bud, sluttid, pris), och visar allt
+i en snygg webbsida — utan att du behöver ha en dator igång.
 
 Byggd som efterföljare till den lokala macOS-POC:en (`Old/`-mappen), och
 körs helt utan egen server, i samma anda som [FortPolio](https://darioswede.github.io/FortPolio/):
@@ -15,21 +16,22 @@ köparnamn, belopp, adresser och spårningsnummer. Se avsnittet
 ## Hur det fungerar
 
 ```
-Gmail (read-only)
-      │
-      │  var 5:e minut
-      ▼
-GitHub Action (scripts/sync_gmail.py)
-      │  tolkar mejl
-      ▼
-data/store.json   (committas till repot av Action:en)
-      │
-      │  GitHub Pages serverar filen statiskt
-      ▼
-index.html + assets/app.js
-      │  hämtas och visas direkt i webbläsaren
-      ▼
-Din försäljningscentral, nåbar från vilken enhet som helst
+Gmail (read-only)              Tradera (publik profilsida)
+      │                                │
+      │  var 5:e minut                 │  var 5:e minut
+      ▼                                ▼
+scripts/sync_gmail.py        scripts/scrape_tradera.py
+      │  tolkar mejl                   │  läser __NEXT_DATA__-JSON
+      └────────────────┬───────────────┘
+                        ▼
+           data/store.json   (committas till repot av Action:en)
+                        │
+                        │  GitHub Pages serverar filen statiskt
+                        ▼
+           index.html + assets/app.js
+                        │  hämtas och visas direkt i webbläsaren
+                        ▼
+           Din försäljningscentral, nåbar från vilken enhet som helst
 ```
 
 Ingen backend-server, ingen databas, ingen hosting-kostnad. GitHub Actions
@@ -40,7 +42,9 @@ sköter synken, GitHub Pages sköter visningen.
 - Kategoriserar mejl: sålt, betalt, inlämningskvitto, meddelande,
   frakthandling, faktura.
 - Grupperar mejl per order till en tidslinje (Såld → Betald → Frakthandling
-  → Inlämnad).
+  → Inlämnad), visad som ett kanban-bräde med en kolumn per steg.
+- Skrapar din publika Tradera-profil för aktiva annonser (Ej sålda-kolumnen):
+  titel, pris, antal bud, sluttid.
 - Tolkar köpare, belopp, spårningsnummer, ombud, paketmått och QR-kod ur
   Tradera/PostNord/DHL/Schenker-mejlen.
 - Månadsvis och årsvis försäljningsstatistik (netto efter frakt).
@@ -52,11 +56,24 @@ sköter synken, GitHub Pages sköter visningen.
 |---|---|
 | `index.html`, `assets/` | Frontend — dashboard |
 | `scripts/sync_gmail.py` | Körs av GitHub Action, hämtar & tolkar Gmail |
+| `scripts/scrape_tradera.py` | Körs av GitHub Action, hämtar aktiva Tradera-annonser |
 | `scripts/shipping_parser.py` | Regex-tolkning av frakt-/spårningsfält |
 | `.github/workflows/sync.yml` | Schemat som kör synken var 5:e minut |
-| `data/store.json` | Ögonblicksbild av tolkade mejl (skapas av Action:en) |
+| `data/store.json` | Ögonblicksbild av mejl + annonser (skapas av Action:en) |
 
 Kom igång: se **[SETUP.md](SETUP.md)**.
+
+## Om Tradera-skrapningen
+
+`scripts/scrape_tradera.py` hämtar bara din **publika** profilsida
+(`tradera.com/profile/items/...`) — samma sida vem som helst kan besöka.
+Ingen inloggning eller Tradera-API-nyckel behövs. Sidan är serverrenderad
+och innehåller all data om dina aktiva annonser (pris, bud, sluttid) som
+ren JSON i sidans `__NEXT_DATA__`-block, vilket scriptet läser direkt.
+
+Skört mot ändringar: om Tradera bygger om sin sida kan JSON-strukturen
+ändras och scriptet sluta fungera. Det påverkar bara "Ej sålda"-kolumnen
+— Gmail-synken (sålt/betalt/frakt) är opåverkad.
 
 ## Säkerhet i korthet
 
