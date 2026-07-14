@@ -56,10 +56,14 @@ def parse_shipping_fields(subject: str, body: str, html: str = "") -> dict[str, 
         r"\bOmbud\s*:?\s*(.+?)(?=\s+(?:Spårningsnr|Sändningsnummer|Kollinummer|$))"
     ], text)
 
+    # Character class utan \s: en spårningskod är alltid en sammanhängande
+    # sträng, så regexen ska stanna vid första blanksteg/radbrytning efter
+    # etiketten istället för att glupskt äta text över flera rader (t.ex.
+    # mottagarens namn och adress i DHL/PostNord-mejl).
     tracking_raw = first([
-        r"Spårningsnr\.?\s*:?\s*([A-Z0-9][A-Z0-9\s\-]{8,60})",
-        r"Sändningsnummer\s*:?\s*([A-Z0-9][A-Z0-9\s\-]{8,60})",
-        r"Kollinummer\s*:?\s*([A-Z0-9][A-Z0-9\s\-]{8,60})"
+        r"Spårningsnr\.?\s*:?\s*([A-Z0-9][A-Z0-9\-]{5,39})",
+        r"Sändningsnummer\s*:?\s*([A-Z0-9][A-Z0-9\-]{5,39})",
+        r"Kollinummer\s*:?\s*([A-Z0-9][A-Z0-9\-]{5,39})"
     ], line_text)
     tracking = compact_tracking(tracking_raw)
     if len(tracking) > 40:

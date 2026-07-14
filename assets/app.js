@@ -55,9 +55,23 @@ function title(it) {
     .trim();
 }
 function groups() {
-  const g = {}, map = {};
+  const g = {}, map = {}, trackMap = {};
   state.emails.forEach(e => { if (e.order) { (g[e.order] ??= []).push(e); if (e.object_id) map[e.object_id] = e.order; } });
   state.emails.forEach(e => { if (!e.order && e.object_id && map[e.object_id] && !g[map[e.object_id]].some(x => x.id === e.id)) g[map[e.object_id]].push(e); });
+  // Bygg ett spårningsnummer-index från mejl som redan hör till en order
+  // (t.ex. frakthandlingen), så att inlämningskvitton — som ofta bara har
+  // transportörens eget "Kollinummer" och inget objekt-id — kan kopplas in.
+  Object.entries(g).forEach(([o, list]) => {
+    list.forEach(e => { [e.tracking_number, e.shipment_number].forEach(t => { if (t && t.length >= 8) trackMap[t] = o; }); });
+  });
+  state.emails.forEach(e => {
+    if (e.order || e.object_id) return;
+    const t = e.tracking_number || e.shipment_number;
+    if (!t || t.length < 8) return;
+    let o = trackMap[t];
+    if (!o) { const k = Object.keys(trackMap).find(x => x.startsWith(t) || t.startsWith(x)); if (k) o = trackMap[k]; }
+    if (o && !g[o].some(x => x.id === e.id)) g[o].push(e);
+  });
   return g;
 }
 function mergedShipping(it) {
@@ -70,11 +84,16 @@ function counts() {
   state.emails.forEach(e => { const k = cat(e); if (c[k] != null) c[k]++; if (e.unread) c.unread++; if (unanswered(e)) c.unanswered++; });
   return c;
 }
+// Tradera tar 10 % i förmedlingsavgift på försäljningspriset, upp till
+// 2000 kr (belopp över det saknar vi uppgift om — allt i den här datan
+// ligger under gränsen).
+function commissionFor(sale) { return Math.min(sale, 2000) * 0.10; }
 function amounts(it) {
   const sale = Math.max(0, ...it.map(e => e.sale_amount || 0));
   const shipping = Math.max(0, ...it.map(e => e.shipping_cost || 0));
   const total = Math.max(0, ...it.map(e => e.total_amount || 0)) || (sale + shipping);
-  return { sale, shipping, total };
+  const commission = commissionFor(sale);
+  return { sale, shipping, total, commission, net: sale - shipping - commission };
 }
 function paidDate(it) {
   const e = it.find(x => cat(x) === "paid") || it.find(x => cat(x) === "sold") || it[0];
@@ -86,18 +105,18 @@ function monthly() {
     if (!it.some(e => cat(e) === "paid")) return;
     const d = paidDate(it); if (isNaN(d)) return;
     const k = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`, a = amounts(it);
-    out[k] ??= { sale: 0, shipping: 0, total: 0, count: 0 };
-    out[k].sale += a.sale; out[k].shipping += a.shipping; out[k].total += a.total; out[k].count++;
+    out[k] ??= { sale: 0, shipping: 0, commission: 0, total: 0, net: 0, count: 0 };
+    out[k].sale += a.sale; out[k].shipping += a.shipping; out[k].commission += a.commission; out[k].total += a.total; out[k].net += a.net; out[k].count++;
   });
   return Object.entries(out).sort((a, b) => b[0].localeCompare(a[0]));
 }
 function annual(year) {
-  const r = { sale: 0, shipping: 0, total: 0, count: 0 };
+  const r = { sale: 0, shipping: 0, commission: 0, total: 0, net: 0, count: 0 };
   Object.values(groups()).forEach(it => {
     if (!it.some(e => cat(e) === "paid")) return;
     const d = paidDate(it); if (isNaN(d) || d.getFullYear() !== year) return;
     const a = amounts(it);
-    r.sale += a.sale; r.shipping += a.shipping; r.total += a.total; r.count++;
+    r.sale += a.sale; r.shipping += a.shipping; r.commission += a.commission; r.total += a.total; r.net += a.net; r.count++;
   });
   return r;
 }
@@ -111,7 +130,7 @@ function years() {
   return [...set].sort((a, b) => b - a);
 }
 function amtRows(a) {
-  return `<div class="amt-row"><span>Varor</span><strong>${money(a.sale)}</strong></div><div class="amt-row"><span>Frakt</span><strong>−${money(a.shipping)}</strong></div><div class="amt-row total"><span>Totalt</span><strong>${money(a.total)}</strong></div>`;
+  return `<div class="amt-row"><span>Varor</span><strong>${money(a.sale)}</strong></div><div class="amt-row"><span>Frakt</span><strong>−${money(a.shipping)}</strong></div><div class="amt-row"><span>Provision (10%)</span><strong>−${money(a.commission)}</strong></div><div class="amt-row total"><span>Netto</span><strong>${money(a.net)}</strong></div>`;
 }
 const STAGES = [
   ["unsold", "Ej sålda"],
@@ -155,20 +174,54 @@ function setTheme(pref) {
 }
 applyTheme(localStorage.getItem(THEME_KEY) || "system");
 
-// ---------- synk-indikator (topplinje) ----------
-function showSyncBar() { document.querySelector("#sync-bar")?.classList.add("active"); }
-function hideSyncBar() { document.querySelector("#sync-bar")?.classList.remove("active"); }
+// ---------- synk-indikator (topplinje, fylls efter verklig nedladdningsandel) ----------
+function setSyncBar(pct) {
+  const bar = document.querySelector("#sync-bar");
+  if (!bar) return;
+  bar.classList.add("active");
+  const fill = bar.querySelector(".fill");
+  if (fill) fill.style.width = `${pct}%`;
+}
+function hideSyncBar() {
+  const bar = document.querySelector("#sync-bar");
+  if (!bar) return;
+  bar.classList.remove("active");
+  const fill = bar.querySelector(".fill");
+  if (fill) fill.style.width = "0%";
+}
+async function fetchDataWithProgress() {
+  setSyncBar(3);
+  const res = await fetch(`${DATA_URL}?t=${Date.now()}`, { cache: "no-store" });
+  if (!res.ok) return null;
+  const totalStr = res.headers.get("content-length");
+  const total = totalStr ? Number(totalStr) : 0;
+  if (!total || !res.body || !res.body.getReader) {
+    setSyncBar(80);
+    return res.json();
+  }
+  const reader = res.body.getReader();
+  const chunks = [];
+  let received = 0;
+  for (;;) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    chunks.push(value);
+    received += value.length;
+    setSyncBar(Math.min(99, Math.round((received / total) * 100)));
+  }
+  setSyncBar(100);
+  const blob = new Blob(chunks);
+  return JSON.parse(await blob.text());
+}
 
 // ---------- laddning ----------
 async function loadData() {
-  showSyncBar();
   try {
-    const res = await fetch(`${DATA_URL}?t=${Date.now()}`, { cache: "no-store" });
-    if (!res.ok) {
+    const payload = await fetchDataWithProgress();
+    if (!payload) {
       document.querySelector("#app").innerHTML = `<div style="padding:30px">Hittar ingen data ännu — har GitHub Action-synken kört minst en gång?</div>`;
       return;
     }
-    const payload = await res.json();
     state.emails = (payload.emails || []).map(norm);
     state.listings = payload.listings || [];
     state.itemImages = payload.item_images || {};
@@ -192,11 +245,9 @@ function stopPolling() {
   state.pollHandle = null;
 }
 async function checkForUpdate() {
-  showSyncBar();
   try {
-    const res = await fetch(`${DATA_URL}?t=${Date.now()}`, { cache: "no-store" });
-    if (!res.ok) return;
-    const payload = await res.json();
+    const payload = await fetchDataWithProgress();
+    if (!payload) return;
     if ((payload.last_sync || 0) !== state.lastSync) {
       state.emails = (payload.emails || []).map(norm);
       state.listings = payload.listings || [];
@@ -238,9 +289,9 @@ function renderApp() {
     </aside>
     <aside class="finance-side">
       <h2>Försäljning</h2>
-      ${y2.length ? y2.map(yr => { const a = annual(yr); return `<div class="fs-card"><h3>${yr}</h3><div class="fs-big">${money(a.sale - a.shipping)}</div>${amtRows(a)}<div class="fs-count">${a.count} betalda order</div></div>`; }).join("") : '<div class="fs-empty">Ingen försäljning ännu.</div>'}
+      ${y2.length ? y2.map(yr => { const a = annual(yr); return `<div class="fs-card"><h3>${yr}</h3><div class="fs-big">${money(a.net)}</div>${amtRows(a)}<div class="fs-count">${a.count} betalda order</div></div>`; }).join("") : '<div class="fs-empty">Ingen försäljning ännu.</div>'}
       <h2>Månadsvis</h2>
-      ${m.length ? m.map(([k, v]) => { const [yr, mo] = k.split("-"); return `<div class="fs-card"><h3>${MONTHS[Number(mo) - 1]} ${yr}</h3><div class="fs-big">${money(v.sale - v.shipping)}</div>${amtRows(v)}<div class="fs-count">${v.count} betalda order</div></div>`; }).join("") : '<div class="fs-empty">Inga belopp identifierade.</div>'}
+      ${m.length ? m.map(([k, v]) => { const [yr, mo] = k.split("-"); return `<div class="fs-card"><h3>${MONTHS[Number(mo) - 1]} ${yr}</h3><div class="fs-big">${money(v.net)}</div>${amtRows(v)}<div class="fs-count">${v.count} betalda order</div></div>`; }).join("") : '<div class="fs-empty">Inga belopp identifierade.</div>'}
     </aside>
     <main>
       <div class="top">
@@ -322,7 +373,7 @@ function draw() {
   const listingCard = (it) => {
     const priceClass = it.bids > 0 ? "green" : "grey";
     const bidding = it.bids > 1 ? '<div class="oflags"><span class="badge fire">🔥 Budgivning</span></div>' : "";
-    return `<a class="order listing" href="${it.url}" target="_blank" rel="noopener"><div class="ohead">${it.image ? `<img class="thumb" src="${it.image}">` : '<div class="thumb placeholder"></div>'}<div class="otitle"><h3>${it.title}</h3><div class="meta">Sluttid ${fmtEnd(it.end_date)}</div></div></div><div class="omoney"><span>${it.bids ? `${it.bids} bud` : "Inga bud"}</span><strong class="${priceClass}">${money(it.price)}</strong></div>${bidding}</a>`;
+    return `<a class="order listing" href="${it.url}" target="_blank" rel="noopener"><div class="ohead">${it.image ? `<img class="thumb" src="${it.image}">` : '<div class="thumb placeholder"></div>'}<div class="otitle"><h3>${it.title}</h3><div class="meta">Sluttid ${fmtEnd(it.end_date)}</div></div></div><div class="omoney listing-money"><span>${it.bids ? `${it.bids} bud` : "Inga bud"}</span><strong class="${priceClass}">${money(it.price)}</strong></div>${bidding}</a>`;
   };
   const listings = (state.listings || [])
     .filter(it => !q || it.title.toLowerCase().includes(q))

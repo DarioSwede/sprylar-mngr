@@ -21,6 +21,7 @@ import struct
 import sys
 import time
 from email.utils import parseaddr
+from html import unescape
 from pathlib import Path
 
 from google.auth.transport.requests import Request
@@ -78,7 +79,16 @@ def clean_html(v):
     v = re.sub(r"(?s)<br\s*/?>", "\n", v)
     v = re.sub(r"(?s)</(p|div|tr|li|h\d)>", "\n", v)
     v = re.sub(r"(?s)<[^>]+>", " ", v)
-    v = v.replace("&nbsp;", " ").replace("&amp;", "&").replace("&quot;", '"')
+    # unescape() dekodar ALLA HTML-entiteter (namngivna + numeriska, t.ex.
+    # &#xE5; -> å), inte bara de tre hårdkodade som tidigare. Tradera
+    # blandar rå UTF-8 och numeriska entiteter i samma mejl, så en ofullständig
+    # avkodning ledde till att t.ex. "Objektnr" eller "Spårningsnr" i
+    # frakthandlings-mejl aldrig matchade sina regex-mönster.
+    v = unescape(v)
+    # Nollbreddstecken (t.ex. &zwj; -> U+200D) som Tradera ibland lägger
+    # mellan en etikett och dess värde ("Objektnr‍737287984") ska
+    # bort helt — annars stoppar de \s*-matchningar i regexen nedan.
+    v = re.sub(r"[​‌‍﻿]", "", v)
     return re.sub(r"[ \t]+", " ", re.sub(r"\n{3,}", "\n\n", v)).strip()
 
 
