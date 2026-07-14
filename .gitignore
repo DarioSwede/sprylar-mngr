@@ -1,0 +1,19 @@
+# Hemligheter - får ALDRIG committas
+credentials.json
+token.json
+SECRETS_TO_COPY.txt
+*.pem
+.env
+
+# macOS
+.DS_Store
+
+# Python
+__pycache__/
+*.pyc
+
+# Loggar från den gamla lokala POC-versionen
+autosync.log
+launchagent-output.log
+launchagent-error.log
+autosync_state.json
