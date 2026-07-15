@@ -16791,9 +16791,45 @@
       "tracking_number": "",
       "package_dimensions": "",
       "package_size": ""
+    },
+    {
+      "id": "19f65a7340e2999d",
+      "thread_id": "19f65a7340e2999d",
+      "from": "Tradera <payment.noreply@tradera.com>",
+      "to": "sprylar@gmail.com",
+      "subject": "Vi har påmint köparen om betalning för Kruka Liljekonvalj Gustavsberg (150333918)",
+      "date": "Wed, 15 Jul 2026 12:01:03 +0000",
+      "internal_date": 1784116863000,
+      "snippet": "Tradera Skapa annons Minneslista Inspiration Obetald försäljning Vi har påmint köparen Bjm.jakobsson om betalning för ordern nedan. När köparen betalar via Tradera så du ett mail från oss. Om köparen",
+      "body": "Skapa annons\r\n \r\n \r\n   \r\n \r\n   \r\n \r\n \r\n Minneslista\r\n \r\n \r\n   \r\n \r\n   \r\n \r\n Inspiration \r\n \r\n \n\r\n \r\n \r\n \r\n \r\n   \r\n \n\r\n \r\n\r\n \r\n \r\n \n\r\n \r\n\r\n \r\n \r\n   \r\n \r\n \r\n\r\n \r\n \r\n \r\n \r\n \r\n \r\n \r\n \r\n Obetald försäljning \r\n \r\n \n\r\n \r\n\r\n \r\n \r\n \r\n   \r\n \n\r\n \r\n \r\n \r\n Vi har påmint köparen Bjm.jakobsson om betalning för ordern nedan. När köparen betalar via Tradera så du ett mail från oss. Om köparen hämtat och betalat varan på plats kan du markera den som betald.\r\n \r\n \n\r\n \r\n \r\n \r\n \r\n   \r\n \n\r\n \r\n \r\n \r\n Köparen har 72 h på sig att betala om de inte tänkt att handla mer. Du kan fråga om de väntar på samfrakt. Du hittar all orderhanering i Dina sålda. \r\n \r\n \n\r\n \r\n \r\n \r\n \r\n   \r\n \n\r\n \r\n \r\n \r\n \r\n \r\n \r\n \r\n \r\n \r\n \r\n \r\n \r\n \r\n \r\n \n\r\n \r\n \r\n \r\n Kruka Liljekonvalj Gustavsberg \r\n \r\n \n\r\n \r\n Objektnr 739288913 \r\n \n\r\n \n\r\n \n\r\n\r\n \r\n \r\n 300 kr\r\n \n\r\n \n\r\n \n\r\n \r\n \n\r\n \r\n \n\r\n\r\n\r\n \r\n \r\n \r\n \r\n \r\n \r\n \r\n \r\n \r\n \r\n \r\n \r\n \r\n Kontakta köparen\r\n \r\n \r\n \r\n \n\r\n \r\n \r\n \n\r\n \r\n \r\n \n\r\n \r\n\r\n \n\r\n \r\n \r\n \r\n   \r\n \n\r\n \r\n \r\n \r\n \r\n \r\n \r\n \r\n \r\n \r\n \r\n \r\n \r\n \r\n \r\n Till Dina sålda\r\n \r\n \r\n \r\n \n\r\n \r\n \r\n \n\r\n \r\n \r\n \n\r\n \r\n\r\n \n\r\n \r\n \r\n \r\n   \r\n \n\r\n \r\n\r\n \r\n \r\n \n\r\n \r\n\r\n \r\n   \r\n \n\r\n \r\n \r\n \r\n \r\n \r\n \r\n \r\n \r\n   \r\n \n\r\n \r\n \r\n \r\n Kundservice \r\n \r\n Hantera dina e-postinställningar \r\n \r\n \r\n \r\n \n\r\n \r\n   \r\n \n\r\n \r\n \r\n \r\n \r\n \r\n \r\n \r\n \r\n \r\n \r\n \r\n \r\n \n\r\n \r\n   \r\n \n\r\n \r\n \r\n \r\n \r\n \r\n \r\n \r\n \r\n \n\r\n \r\n   \r\n \n\r\n \r\n \r\n \n\r\n \r\n   \r\n \n\r\n \r\n \r\n \r\n © 2026 Tradera",
+      "unread": true,
+      "labels": [
+        "UNREAD",
+        "IMPORTANT",
+        "CATEGORY_UPDATES",
+        "INBOX"
+      ],
+      "url": "https://mail.google.com/mail/#all/19f65a7340e2999d",
+      "order": "",
+      "object_id": "150333918",
+      "buyer": "n Bjm",
+      "sale_amount": null,
+      "shipping_cost": null,
+      "total_amount": null,
+      "thread_has_reply": false,
+      "latest_message_is_mine": false,
+      "shipment_number": "",
+      "qr_code_data_url": "https://static.tradera.net/internal/email/icons/20/network-fb.png?v=1",
+      "shipping_carrier": "",
+      "shipping_service": "",
+      "shipping_weight": "",
+      "shipping_pickup": "",
+      "tracking_number": "",
+      "package_dimensions": "",
+      "package_size": ""
     }
   ],
-  "last_sync": 1784111314,
+  "last_sync": 1784116982,
   "listings": [
     {
       "id": 739720070,
@@ -17336,7 +17372,7 @@
       "image": "https://img.tradera.net/small-square/919/652313919_b12e3e97-4424-4853-9aa5-742d27d64825.jpg"
     }
   ],
-  "listings_synced_at": 1784111314,
+  "listings_synced_at": 1784116983,
   "item_images": {
     "739720070": "https://img.tradera.net/small-square/750/651725750_ec330ab8-6a4a-41a5-9579-31530c14cb9b.jpg",
     "740203952": "https://img.tradera.net/small-square/773/652085773_68b97a78-b1fe-4d4a-9024-8b4a24a277d9.jpg",
