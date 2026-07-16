@@ -295,12 +295,6 @@ function renderApp() {
       </div>
       <div class="versionbox"><strong>Sprylar Manager</strong><br>Statisk webbversion<br>Synkas via GitHub Actions</div>
     </aside>
-    <aside class="finance-side">
-      <h2>Försäljning</h2>
-      ${y2.length ? y2.map(yr => { const a = annual(yr); return `<div class="fs-card"><h3>${yr}</h3><div class="fs-big">${money(a.net)}</div>${amtRows(a)}<div class="fs-count">${a.count} betalda order</div></div>`; }).join("") : '<div class="fs-empty">Ingen försäljning ännu.</div>'}
-      <h2>Månadsvis</h2>
-      ${m.length ? m.map(([k, v]) => { const [yr, mo] = k.split("-"); return `<div class="fs-card"><h3>${MONTHS[Number(mo) - 1]} ${yr}</h3><div class="fs-big">${money(v.net)}</div>${amtRows(v)}<div class="fs-count">${v.count} betalda order</div></div>`; }).join("") : '<div class="fs-empty">Inga belopp identifierade.</div>'}
-    </aside>
     <main>
       <div class="top">
         <div><h1>Försäljningscentral</h1><p>Order, meddelanden, frakt och bokföringsunderlag.</p></div>
@@ -313,11 +307,12 @@ function renderApp() {
       <div class="tabs">
         <button data-v="mail" class="${state.view === "mail" ? "active" : ""}">Mejl</button>
         <button data-v="orders" class="${state.view === "orders" ? "active" : ""}">Ordertidslinjer</button>
+        <button data-v="stats" class="${state.view === "stats" ? "active" : ""}">Statistik</button>
       </div>
-      <div class="toolbar">
+      ${state.view !== "stats" ? `<div class="toolbar">
         <input id="q" placeholder="Sök vara, köpare, spårningsnummer eller ombud…">
         <select id="sort"><option value="new">Nyast först</option><option value="old">Äldst först</option></select>
-      </div>
+      </div>` : ""}
       <section id="content"></section>
     </main>
   </div>`;
@@ -331,10 +326,71 @@ function updateSyncLine() {
   if (el) el.innerHTML = `<strong><span class="dot"></span>Senast kontrollerad: ${new Date().toLocaleTimeString("sv-SE")}</strong>Data synkad: ${timeAgo(state.lastSync)}`;
 }
 
+function monthsForYear(year) {
+  const byKey = Object.fromEntries(monthly());
+  return Array.from({ length: 12 }, (_, i) => {
+    const k = `${year}-${String(i + 1).padStart(2, "0")}`;
+    return [k, byKey[k] || { sale: 0, shipping: 0, commission: 0, total: 0, net: 0, count: 0 }];
+  });
+}
+function salesChartSvg(monthEntries) {
+  const W = 900, H = 260, PAD = 34, gap = 10;
+  const max = Math.max(1, ...monthEntries.map(([, v]) => v.net));
+  const n = monthEntries.length;
+  const barW = (W - PAD * 2) / n - gap;
+  const bars = monthEntries.map(([k, v], i) => {
+    const mo = Number(k.split("-")[1]) - 1;
+    const h = v.net > 0 ? Math.max(3, (v.net / max) * (H - PAD * 2 - 20)) : 0;
+    const x = PAD + i * (barW + gap);
+    const y = H - PAD - h;
+    return `<g class="bar-g">
+      <rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${barW.toFixed(1)}" height="${h.toFixed(1)}" rx="4" class="bar"></rect>
+      ${v.net > 0 ? `<text x="${(x + barW / 2).toFixed(1)}" y="${(y - 7).toFixed(1)}" text-anchor="middle" class="bar-label">${Math.round(v.net)}</text>` : ""}
+      <text x="${(x + barW / 2).toFixed(1)}" y="${H - PAD + 16}" text-anchor="middle" class="bar-month">${MONTHS[mo].slice(0, 3)}</text>
+      <title>${MONTHS[mo]}: ${money(v.net)} netto, ${v.count} order</title>
+    </g>`;
+  }).join("");
+  return `<svg viewBox="0 0 ${W} ${H}" class="chart" preserveAspectRatio="xMidYMid meet">
+    <line x1="${PAD}" y1="${H - PAD}" x2="${W - PAD}" y2="${H - PAD}" class="axis"></line>
+    ${bars}
+  </svg>`;
+}
+function drawStats() {
+  const el = document.querySelector("#content");
+  const y2 = years();
+  const chartYear = Number(document.querySelector("#chart-year")?.value) || y2[0] || new Date().getFullYear();
+  const m = monthsForYear(chartYear);
+  el.className = "stats-page";
+  el.innerHTML = `
+    <section class="panel chart-panel">
+      <div class="chart-head">
+        <h2>Försäljning över året</h2>
+        ${y2.length > 1 ? `<select id="chart-year">${y2.map(yr => `<option value="${yr}" ${yr === chartYear ? "selected" : ""}>${yr}</option>`).join("")}</select>` : `<span class="meta">${chartYear}</span>`}
+      </div>
+      ${salesChartSvg(m)}
+    </section>
+    <div class="stats-grid">
+      <div>
+        <h2 class="section-label">Försäljning</h2>
+        ${y2.length ? y2.map(yr => { const a = annual(yr); return `<div class="fs-card"><h3>${yr}</h3><div class="fs-big">${money(a.net)}</div>${amtRows(a)}<div class="fs-count">${a.count} betalda order</div></div>`; }).join("") : '<div class="fs-empty">Ingen försäljning ännu.</div>'}
+      </div>
+      <div>
+        <h2 class="section-label">Månadsvis</h2>
+        <div class="stats-months">
+        ${monthly().length ? monthly().map(([k, v]) => { const [yr, mo] = k.split("-"); return `<div class="fs-card"><h3>${MONTHS[Number(mo) - 1]} ${yr}</h3><div class="fs-big">${money(v.net)}</div>${amtRows(v)}<div class="fs-count">${v.count} betalda order</div></div>`; }).join("") : '<div class="fs-empty">Inga belopp identifierade.</div>'}
+        </div>
+      </div>
+    </div>`;
+  const yearSel = document.querySelector("#chart-year");
+  if (yearSel) yearSel.onchange = drawStats;
+}
+
 function draw() {
   const q = (document.querySelector("#q")?.value || "").toLowerCase();
   const el = document.querySelector("#content");
   const sort = document.querySelector("#sort")?.value || "new";
+
+  if (state.view === "stats") { drawStats(); return; }
 
   if (state.view === "mail") {
     let a = state.emails.filter(e =>
@@ -461,8 +517,8 @@ function toast(t) {
 function bind() {
   document.querySelectorAll("[data-f]").forEach(b => b.onclick = () => { state.filter = b.dataset.f; renderApp(); });
   document.querySelectorAll("[data-v]").forEach(b => b.onclick = () => { state.view = b.dataset.v; renderApp(); });
-  document.querySelector("#q").oninput = draw;
-  document.querySelector("#sort").onchange = draw;
+  const qEl = document.querySelector("#q"); if (qEl) qEl.oninput = draw;
+  const sortEl = document.querySelector("#sort"); if (sortEl) sortEl.onchange = draw;
   document.querySelector("#refresh-btn").onclick = () => checkForUpdate();
   document.querySelector("#settings-btn").onclick = openSettings;
   document.querySelector("#content").onclick = e => {
