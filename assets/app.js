@@ -15,6 +15,7 @@ let state = {
   emails: [],
   listings: [],
   itemImages: {},
+  orderLedger: {},
   lastSync: 0,
   filter: "all",
   view: "orders",
@@ -85,14 +86,19 @@ function counts() {
   return c;
 }
 // Tradera tar 10 % i förmedlingsavgift på försäljningspriset, upp till
-// 2000 kr (belopp över det saknar vi uppgift om — allt i den här datan
-// ligger under gränsen).
+// 2000 kr — används bara som fallback när ordern saknas i den importerade
+// utbetalningsrapporten (se scripts/import_payouts.py / state.orderLedger),
+// som har den verkliga provisionen per order.
 function commissionFor(sale) { return Math.min(sale, 2000) * 0.10; }
 function amounts(it) {
-  const sale = Math.max(0, ...it.map(e => e.sale_amount || 0));
-  const shipping = Math.max(0, ...it.map(e => e.shipping_cost || 0));
-  const total = Math.max(0, ...it.map(e => e.total_amount || 0)) || (sale + shipping);
-  const commission = commissionFor(sale);
+  const emailSale = Math.max(0, ...it.map(e => e.sale_amount || 0));
+  const emailShipping = Math.max(0, ...it.map(e => e.shipping_cost || 0));
+  const total = Math.max(0, ...it.map(e => e.total_amount || 0)) || (emailSale + emailShipping);
+  const orderNo = it.find(x => x.order)?.order;
+  const led = orderNo && state.orderLedger[orderNo];
+  const sale = led && led.sale > 0 ? led.sale : emailSale;
+  const shipping = led && led.shipping > 0 ? led.shipping : emailShipping;
+  const commission = led && led.commission > 0 ? led.commission : commissionFor(sale);
   return { sale, shipping, total, commission, net: sale - shipping - commission };
 }
 function paidDate(it) {
@@ -225,6 +231,7 @@ async function loadData() {
     state.emails = (payload.emails || []).map(norm);
     state.listings = payload.listings || [];
     state.itemImages = payload.item_images || {};
+    state.orderLedger = payload.order_ledger || {};
     state.lastSync = payload.last_sync || 0;
     renderApp();
     startPolling();
@@ -252,6 +259,7 @@ async function checkForUpdate() {
       state.emails = (payload.emails || []).map(norm);
       state.listings = payload.listings || [];
       state.itemImages = payload.item_images || {};
+    state.orderLedger = payload.order_ledger || {};
       state.lastSync = payload.last_sync || 0;
       renderApp();
       toast("Ny data synkad från Gmail");
@@ -426,7 +434,7 @@ function orderDetailHtml(o) {
   const thumb = objId && state.itemImages[objId];
   return `<div class="modal-head">${thumb ? `<img class="modal-thumb" src="${thumb}">` : ""}<div><h2>${title(it)}</h2><div class="meta">Köpare <strong>${b}</strong> · Order ${o}${objId ? ` · Objekt ${objId}` : ""}</div></div></div>
     <div class="modal-money"><div><span>Varan</span><strong>${a.sale ? money(a.sale) : "–"}</strong></div><div><span>Frakt</span><strong>${a.shipping ? money(a.shipping) : "–"}</strong></div><div><span>Totalt</span><strong>${a.total ? money(a.total) : "–"}</strong></div></div>
-    ${ship ? `<div class="shipping-grid full"><div class="field"><span>Transportbolag</span><strong>${s.carrier || "Ej identifierat"}</strong></div><div class="field"><span>Närmaste ombud</span><strong>${s.pickup || "Ej identifierat"}</strong></div><div class="field"><span>Spårningsnr.</span><strong>${s.tracking || "Ej identifierat"}</strong></div><div class="field"><span>Sändningsnr.</span><strong>${s.shipment || "Ej identifierat"}</strong></div><div class="field"><span>Tjänst och vikt</span><strong>${[s.service, s.weight].filter(Boolean).join(" · ") || "Ej identifierat"}</strong></div><div class="field"><span>Paketstorlek och mått</span><strong>${[s.size, s.dimensions].filter(Boolean).join(" · ") || "Ej identifierat"}</strong></div></div>${s.qr ? `<img class="qr-full" src="${s.qr}" alt="QR-kod">` : ""}` : `<p class="meta">Ingen frakthandling identifierad ännu.</p>`}
+    ${ship ? `${s.qr ? `<div class="qr-wrap"><img class="qr-full" src="${s.qr}" alt="QR-kod"><span class="meta">Visa QR-koden hos ombudet</span></div>` : ""}<div class="shipping-grid full"><div class="field"><span>Transportbolag</span><strong>${s.carrier || "Ej identifierat"}</strong></div><div class="field"><span>Närmaste ombud</span><strong>${s.pickup || "Ej identifierat"}</strong></div><div class="field"><span>Spårningsnr.</span><strong>${s.tracking || "Ej identifierat"}</strong></div><div class="field"><span>Sändningsnr.</span><strong>${s.shipment || "Ej identifierat"}</strong></div><div class="field"><span>Tjänst och vikt</span><strong>${[s.service, s.weight].filter(Boolean).join(" · ") || "Ej identifierat"}</strong></div><div class="field"><span>Paketstorlek och mått</span><strong>${[s.size, s.dimensions].filter(Boolean).join(" · ") || "Ej identifierat"}</strong></div></div>` : `<p class="meta">Ingen frakthandling identifierad ännu.</p>`}
     <a class="open" href="${latest.url}" target="_blank">Öppna i Gmail →</a>`;
 }
 function openSettings() {

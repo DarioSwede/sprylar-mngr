@@ -17662,5 +17662,347 @@
     "740501303": "https://img.tradera.net/small-square/993/652313993_c62864d4-e37f-43ca-bf2a-2c5efddd9c62.jpg",
     "740501199": "https://img.tradera.net/small-square/919/652313919_b12e3e97-4424-4853-9aa5-742d27d64825.jpg",
     "740672177": "https://img.tradera.net/small-square/173/652443173_49fa1840-eabd-4088-bfaf-4f083c6f5b92.jpg"
+  },
+  "order_ledger": {
+    "150370407": {
+      "sale": 972.0,
+      "shipping": 78.0,
+      "commission": 97.2
+    },
+    "150302847": {
+      "sale": 420.0,
+      "shipping": 49.0,
+      "commission": 42.0
+    },
+    "150333918": {
+      "sale": 0.0,
+      "shipping": 0.0,
+      "commission": 30.0
+    },
+    "150164741": {
+      "sale": 150.0,
+      "shipping": 49.0,
+      "commission": 15.0
+    },
+    "150094380": {
+      "sale": 300.0,
+      "shipping": 59.0,
+      "commission": 30.0
+    },
+    "150089803": {
+      "sale": 400.0,
+      "shipping": 143.0,
+      "commission": 40.0
+    },
+    "150050180": {
+      "sale": 261.0,
+      "shipping": 56.0,
+      "commission": 26.1
+    },
+    "150034955": {
+      "sale": 250.0,
+      "shipping": 49.0,
+      "commission": 25.0
+    },
+    "150016150": {
+      "sale": 600.0,
+      "shipping": 59.0,
+      "commission": 60.0
+    },
+    "149884701": {
+      "sale": 625.0,
+      "shipping": 49.0,
+      "commission": 62.5
+    },
+    "149867474": {
+      "sale": 320.0,
+      "shipping": 56.0,
+      "commission": 32.0
+    },
+    "149803237": {
+      "sale": 300.0,
+      "shipping": 56.0,
+      "commission": 30.0
+    },
+    "149711840": {
+      "sale": 700.0,
+      "shipping": 68.0,
+      "commission": 70.0
+    },
+    "149822602": {
+      "sale": 250.0,
+      "shipping": 59.0,
+      "commission": 25.0
+    },
+    "149820354": {
+      "sale": 250.0,
+      "shipping": 49.0,
+      "commission": 25.0
+    },
+    "149791023": {
+      "sale": 700.0,
+      "shipping": 73.0,
+      "commission": 70.0
+    },
+    "149694047": {
+      "sale": 400.0,
+      "shipping": 49.0,
+      "commission": 40.0
+    },
+    "149657808": {
+      "sale": 500.0,
+      "shipping": 59.0,
+      "commission": 50.0
+    },
+    "149602265": {
+      "sale": 200.0,
+      "shipping": 59.0,
+      "commission": 20.0
+    },
+    "149510559": {
+      "sale": 50.0,
+      "shipping": 140.0,
+      "commission": 5.0
+    },
+    "149562877": {
+      "sale": 75.0,
+      "shipping": 49.0,
+      "commission": 7.5
+    },
+    "149356166": {
+      "sale": 800.0,
+      "shipping": 79.0,
+      "commission": 80.0
+    },
+    "149389335": {
+      "sale": 320.0,
+      "shipping": 49.0,
+      "commission": 32.0
+    },
+    "149370771": {
+      "sale": 850.0,
+      "shipping": 59.0,
+      "commission": 85.0
+    },
+    "149363985": {
+      "sale": 210.0,
+      "shipping": 49.0,
+      "commission": 21.0
+    },
+    "149363478": {
+      "sale": 300.0,
+      "shipping": 53.0,
+      "commission": 30.0
+    },
+    "149345814": {
+      "sale": 300.0,
+      "shipping": 49.0,
+      "commission": 30.0
+    },
+    "149281542": {
+      "sale": 800.0,
+      "shipping": 49.0,
+      "commission": 80.0
+    },
+    "149135215": {
+      "sale": 490.0,
+      "shipping": 59.0,
+      "commission": 49.0
+    },
+    "149187567": {
+      "sale": 135.0,
+      "shipping": 49.0,
+      "commission": 13.5
+    },
+    "148975959": {
+      "sale": 800.0,
+      "shipping": 119.0,
+      "commission": 80.0
+    },
+    "149136155": {
+      "sale": 550.0,
+      "shipping": 49.0,
+      "commission": 55.0
+    },
+    "149060994": {
+      "sale": 270.0,
+      "shipping": 59.0,
+      "commission": 27.0
+    },
+    "148914994": {
+      "sale": 80.0,
+      "shipping": 49.0,
+      "commission": 8.0
+    },
+    "148728653": {
+      "sale": 1300.0,
+      "shipping": 72.0,
+      "commission": 130.0
+    },
+    "148896635": {
+      "sale": 250.0,
+      "shipping": 59.0,
+      "commission": 25.0
+    },
+    "148725856": {
+      "sale": 225.0,
+      "shipping": 50.0,
+      "commission": 22.5
+    },
+    "148873990": {
+      "sale": 75.0,
+      "shipping": 56.0,
+      "commission": 7.5
+    },
+    "148834822": {
+      "sale": 200.0,
+      "shipping": 56.0,
+      "commission": 20.0
+    },
+    "148747737": {
+      "sale": 650.0,
+      "shipping": 59.0,
+      "commission": 65.0
+    },
+    "148661136": {
+      "sale": 300.0,
+      "shipping": 59.0,
+      "commission": 30.0
+    },
+    "148592678": {
+      "sale": 700.0,
+      "shipping": 59.0,
+      "commission": 70.0
+    },
+    "148524904": {
+      "sale": 200.0,
+      "shipping": 49.0,
+      "commission": 20.0
+    },
+    "148486960": {
+      "sale": 840.0,
+      "shipping": 59.0,
+      "commission": 84.0
+    },
+    "148428502": {
+      "sale": 200.0,
+      "shipping": 56.0,
+      "commission": 20.0
+    },
+    "148430526": {
+      "sale": 300.0,
+      "shipping": 56.0,
+      "commission": 30.0
+    },
+    "148430501": {
+      "sale": 90.0,
+      "shipping": 49.0,
+      "commission": 9.0
+    },
+    "148428818": {
+      "sale": 200.0,
+      "shipping": 49.0,
+      "commission": 20.0
+    },
+    "148357923": {
+      "sale": 400.0,
+      "shipping": 49.0,
+      "commission": 40.0
+    },
+    "148134819": {
+      "sale": 20.0,
+      "shipping": 22.0,
+      "commission": 3.0
+    },
+    "148192464": {
+      "sale": 190.0,
+      "shipping": 22.0,
+      "commission": 19.0
+    },
+    "148194655": {
+      "sale": 100.0,
+      "shipping": 49.0,
+      "commission": 10.0
+    },
+    "148135017": {
+      "sale": 90.0,
+      "shipping": 22.0,
+      "commission": 9.0
+    },
+    "148149911": {
+      "sale": 725.0,
+      "shipping": 59.0,
+      "commission": 72.5
+    },
+    "147647391": {
+      "sale": 285.0,
+      "shipping": 54.0,
+      "commission": 28.5
+    },
+    "147385581": {
+      "sale": 75.0,
+      "shipping": 47.0,
+      "commission": 7.5
+    },
+    "146659836": {
+      "sale": 120.0,
+      "shipping": 47.0,
+      "commission": 12.0
+    },
+    "146718069": {
+      "sale": 270.0,
+      "shipping": 0.0,
+      "commission": 27.0
+    },
+    "146468843": {
+      "sale": 225.0,
+      "shipping": 73.0,
+      "commission": 22.5
+    },
+    "146145060": {
+      "sale": 265.0,
+      "shipping": 54.0,
+      "commission": 26.5
+    },
+    "146049688": {
+      "sale": 525.0,
+      "shipping": 0.0,
+      "commission": 52.5
+    },
+    "146017689": {
+      "sale": 125.0,
+      "shipping": 54.0,
+      "commission": 12.5
+    },
+    "145890194": {
+      "sale": 620.0,
+      "shipping": 59.0,
+      "commission": 62.0
+    },
+    "145929638": {
+      "sale": 300.0,
+      "shipping": 47.0,
+      "commission": 30.0
+    },
+    "145916734": {
+      "sale": 175.0,
+      "shipping": 47.0,
+      "commission": 17.5
+    },
+    "145890193": {
+      "sale": 300.0,
+      "shipping": 59.0,
+      "commission": 30.0
+    },
+    "145777083": {
+      "sale": 400.0,
+      "shipping": 59.0,
+      "commission": 40.0
+    },
+    "145651549": {
+      "sale": 200.0,
+      "shipping": 136.0,
+      "commission": 0.0
+    }
   }
 }
