@@ -17038,9 +17038,44 @@
       "tracking_number": "",
       "package_dimensions": "",
       "package_size": ""
+    },
+    {
+      "id": "19f6aedacf791fb7",
+      "thread_id": "19f6aedacf791fb7",
+      "from": "noreply@postnord.com",
+      "to": "sprylar@gmail.com",
+      "subject": "Ditt inlämningskvitto",
+      "date": "Thu, 16 Jul 2026 12:36:28 +0000 (UTC)",
+      "internal_date": 1784205388000,
+      "snippet": "Specifikation från PostNord Tack för att du använder PostNord. Ditt inlämningskvitto är bifogat som pdf i detta mail. Vänliga hälsningar, PostNord PostNord Sverige AB Momsreg.nr. SE556711569501",
+      "body": "Retail Receipt \r\n \r\n \r\n\r\n \r\n \r\n \r\n \r\n \r\n \r\n \r\n \r\n \r\n \r\n \r\n \r\n \r\n \r\n Specifikation från PostNord\n\r\n\r\n \r\n \r\n \r\n \r\n \n\r\n \r\n \r\n \r\n \n\r\n \r\n \r\n \r\n \r\n \r\n \r\n Tack för att du använder PostNord. \n\r\n Ditt inlämningskvitto är bifogat som pdf i detta mail.\n\r\n Vänliga hälsningar, PostNord\n\r\n \n\r\n \r\n PostNord Sverige AB\n\r\n Momsreg.nr. SE556711569501",
+      "unread": true,
+      "labels": [
+        "UNREAD",
+        "CATEGORY_UPDATES",
+        "INBOX"
+      ],
+      "url": "https://mail.google.com/mail/#all/19f6aedacf791fb7",
+      "order": "",
+      "object_id": "",
+      "buyer": "",
+      "sale_amount": null,
+      "shipping_cost": null,
+      "total_amount": null,
+      "thread_has_reply": false,
+      "latest_message_is_mine": false,
+      "shipment_number": "",
+      "qr_code_data_url": "https://portal.postnord.com/skickadirekt/assets/images/email/postnord-logo-blue.jpg",
+      "shipping_carrier": "PostNord",
+      "shipping_service": "PostNord Tack för att du använder PostNord. Ditt inlämningskvitto är bifogat som pdf i",
+      "shipping_weight": "",
+      "shipping_pickup": "",
+      "tracking_number": "",
+      "package_dimensions": "",
+      "package_size": ""
     }
   ],
-  "last_sync": 1784200108,
+  "last_sync": 1784206135,
   "listings": [
     {
       "id": 740203952,
@@ -17583,7 +17618,7 @@
       "image": "https://img.tradera.net/small-square/919/652313919_b12e3e97-4424-4853-9aa5-742d27d64825.jpg"
     }
   ],
-  "listings_synced_at": 1784200109,
+  "listings_synced_at": 1784206136,
   "item_images": {
     "739720070": "https://img.tradera.net/small-square/750/651725750_ec330ab8-6a4a-41a5-9579-31530c14cb9b.jpg",
     "740203952": "https://img.tradera.net/small-square/773/652085773_68b97a78-b1fe-4d4a-9024-8b4a24a277d9.jpg",
