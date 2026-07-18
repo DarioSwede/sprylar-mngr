@@ -17039,7 +17039,7 @@
       "package_size": ""
     }
   ],
-  "last_sync": 1784391122,
+  "last_sync": 1784394907,
   "listings": [
     {
       "id": 740203952,
@@ -17604,9 +17604,21 @@
       "end_date": "2026-07-24T20:30:55.6030000Z",
       "url": "https://www.tradera.com/item/201208/740501199/vas-med-handtag-staatliche-majolika-manufaktur-karlsruhe",
       "image": "https://img.tradera.net/small-square/919/652313919_b12e3e97-4424-4853-9aa5-742d27d64825.jpg"
+    },
+    {
+      "id": 740995575,
+      "title": "Fristads arbetarbyxor mörkblå byxor, storlek C48 Nya!",
+      "price": 400,
+      "buy_now_price": 0,
+      "bids": 0,
+      "item_type": "Auction",
+      "start_date": "2026-07-18T16:56:29.3782841Z",
+      "end_date": "2026-07-25T16:56:29.3220000Z",
+      "url": "https://www.tradera.com/item/302444/740995575/fristads-arbetarbyxor-morkbla-byxor-storlek-c48-nya-",
+      "image": "https://img.tradera.net/small-square/416/652685416_ff869e14-c1f1-4241-8a46-bed2332cf9e8.jpg"
     }
   ],
-  "listings_synced_at": 1784391123,
+  "listings_synced_at": 1784394908,
   "item_images": {
     "739720070": "https://img.tradera.net/small-square/750/651725750_ec330ab8-6a4a-41a5-9579-31530c14cb9b.jpg",
     "740203952": "https://img.tradera.net/small-square/773/652085773_68b97a78-b1fe-4d4a-9024-8b4a24a277d9.jpg",
@@ -17655,7 +17667,8 @@
     "740501199": "https://img.tradera.net/small-square/919/652313919_b12e3e97-4424-4853-9aa5-742d27d64825.jpg",
     "740672177": "https://img.tradera.net/small-square/173/652443173_49fa1840-eabd-4088-bfaf-4f083c6f5b92.jpg",
     "740742725": "https://img.tradera.net/small-square/511/652495511_d775c50f-54d8-4141-93d1-728785dc958d.jpg",
-    "740743802": "https://img.tradera.net/small-square/299/652496299_7efd6b53-8e5f-4c19-960c-516edb22caed.jpg"
+    "740743802": "https://img.tradera.net/small-square/299/652496299_7efd6b53-8e5f-4c19-960c-516edb22caed.jpg",
+    "740995575": "https://img.tradera.net/small-square/416/652685416_ff869e14-c1f1-4241-8a46-bed2332cf9e8.jpg"
   },
   "order_ledger": {
     "150370407": {
