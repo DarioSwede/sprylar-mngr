@@ -17039,7 +17039,7 @@
       "package_size": ""
     }
   ],
-  "last_sync": 1784398254,
+  "last_sync": 1784403128,
   "listings": [
     {
       "id": 740203952,
@@ -17718,7 +17718,7 @@
       "title": "Klocka Raymond Weil Geneve 18K guldpläterad klocka med läderarmband",
       "price": 700,
       "buy_now_price": 0,
-      "bids": 0,
+      "bids": 1,
       "item_type": "Auction",
       "start_date": "2026-07-14T17:40:09.3730000Z",
       "end_date": "2026-07-24T17:40:09.2530000Z",
@@ -17730,7 +17730,7 @@
       "title": "Klocka Raymond Weil Geneve 18K guldpläterad klocka med läderarmband",
       "price": 700,
       "buy_now_price": 0,
-      "bids": 0,
+      "bids": 1,
       "item_type": "Auction",
       "start_date": "2026-07-14T17:40:09.3730000Z",
       "end_date": "2026-07-24T17:40:09.2530000Z",
@@ -17966,18 +17966,6 @@
       "image": "https://img.tradera.net/small-square/345/652316345_ba2717fe-7c47-4166-ad8b-d80e4c66e0b2.jpg"
     },
     {
-      "id": 740504081,
-      "title": "Figurin troll efter John Bauer Rosa Ljung Original Trollfigur Keramik",
-      "price": 250,
-      "buy_now_price": 0,
-      "bids": 0,
-      "item_type": "Auction",
-      "start_date": "2026-07-14T17:46:15.0130000Z",
-      "end_date": "2026-07-24T17:46:14.9670000Z",
-      "url": "https://www.tradera.com/item/201112/740504081/figurin-troll-efter-john-bauer-rosa-ljung-original-trollfigur-keramik",
-      "image": "https://img.tradera.net/small-square/345/652316345_ba2717fe-7c47-4166-ad8b-d80e4c66e0b2.jpg"
-    },
-    {
       "id": 740504323,
       "title": "Stella axelremsväska i brunt läder Made in Italy Oanvänd",
       "price": 360,
@@ -18168,6 +18156,18 @@
       "end_date": "2026-07-24T20:30:55.6030000Z",
       "url": "https://www.tradera.com/item/201208/740501199/vas-med-handtag-staatliche-majolika-manufaktur-karlsruhe",
       "image": "https://img.tradera.net/small-square/919/652313919_b12e3e97-4424-4853-9aa5-742d27d64825.jpg"
+    },
+    {
+      "id": 740995575,
+      "title": "Fristads arbetarbyxor mörkblå, storlek C48 Nya!",
+      "price": 400,
+      "buy_now_price": 0,
+      "bids": 0,
+      "item_type": "Auction",
+      "start_date": "2026-07-18T16:56:29.3782841Z",
+      "end_date": "2026-07-25T16:56:29.3220000Z",
+      "url": "https://www.tradera.com/item/302444/740995575/fristads-arbetarbyxor-morkbla-storlek-c48-nya-",
+      "image": "https://img.tradera.net/small-square/416/652685416_ff869e14-c1f1-4241-8a46-bed2332cf9e8.jpg"
     },
     {
       "id": 741004229,
@@ -18194,7 +18194,7 @@
       "image": "https://img.tradera.net/small-square/885/652691885_7ae9addd-6532-40e2-bfab-a66f19bdace1.jpg"
     }
   ],
-  "listings_synced_at": 1784398257,
+  "listings_synced_at": 1784403130,
   "item_images": {
     "739720070": "https://img.tradera.net/small-square/750/651725750_ec330ab8-6a4a-41a5-9579-31530c14cb9b.jpg",
     "740203952": "https://img.tradera.net/small-square/773/652085773_68b97a78-b1fe-4d4a-9024-8b4a24a277d9.jpg",
