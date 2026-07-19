@@ -40,13 +40,22 @@ def fetch_discover(page: int) -> dict:
 
 
 def fetch_all_items() -> list[dict]:
+    # OBS: Traderas ?page=N-parameter paginerar inte tillförlitligt för den
+    # här profilvyn — den kan returnera samma (eller en omblandad delmängd
+    # av samma) annonser istället för nästa sida. Vi dedupar därför på
+    # itemId medan vi hämtar, så att sådana överlapp aldrig ger dubbletter
+    # i store.json.
     discover = fetch_discover(1)
     items = list(discover.get("items") or [])
+    seen = {it.get("itemId") for it in items}
     page_count = (discover.get("pagination") or {}).get("pageCount", 1)
     for p in range(2, page_count + 1):
         time.sleep(1)
         discover = fetch_discover(p)
-        items.extend(discover.get("items") or [])
+        for it in discover.get("items") or []:
+            if it.get("itemId") not in seen:
+                seen.add(it.get("itemId"))
+                items.append(it)
     return items
 
 
@@ -67,7 +76,10 @@ def simplify(item: dict) -> dict:
 
 def main():
     items = fetch_all_items()
-    listings = sorted((simplify(i) for i in items), key=lambda x: x["end_date"])
+    by_id = {}
+    for it in (simplify(i) for i in items):
+        by_id[it["id"]] = it
+    listings = sorted(by_id.values(), key=lambda x: x["end_date"])
 
     store = {}
     if STORE.exists():
