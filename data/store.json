@@ -17255,20 +17255,8 @@
       "package_size": ""
     }
   ],
-  "last_sync": 1784564670,
+  "last_sync": 1784572091,
   "listings": [
-    {
-      "id": 740380066,
-      "title": "Hängare 4 krokar. Mässing Segelbåt",
-      "price": 180,
-      "buy_now_price": 0,
-      "bids": 0,
-      "item_type": "Auction",
-      "start_date": "2026-07-13T18:11:19.9630000Z",
-      "end_date": "2026-07-20T18:11:19.9130000Z",
-      "url": "https://www.tradera.com/item/340959/740380066/hangare-4-krokar-massing-segelbat",
-      "image": "https://img.tradera.net/small-square/521/652218521_a1b1fb4f-43f2-464b-8a84-d7a6450b33c9.jpg"
-    },
     {
       "id": 740500478,
       "title": "Vas Gullaskruf Carlos Belaque Signerad Daterad",
@@ -17742,7 +17730,7 @@
       "title": "Perry Ellis cigarrcase för 3 cigarrer – Äkta läder – Churchill/Robusto",
       "price": 99,
       "buy_now_price": 0,
-      "bids": 0,
+      "bids": 1,
       "item_type": "Auction",
       "start_date": "2026-07-18T21:52:24.2030000Z",
       "end_date": "2026-07-25T18:52:24.1530000Z",
@@ -17798,7 +17786,7 @@
       "image": "https://img.tradera.net/small-square/885/652691885_7ae9addd-6532-40e2-bfab-a66f19bdace1.jpg"
     }
   ],
-  "listings_synced_at": 1784564671,
+  "listings_synced_at": 1784572092,
   "item_images": {
     "739720070": "https://img.tradera.net/small-square/750/651725750_ec330ab8-6a4a-41a5-9579-31530c14cb9b.jpg",
     "740203952": "https://img.tradera.net/small-square/773/652085773_68b97a78-b1fe-4d4a-9024-8b4a24a277d9.jpg",
