@@ -18117,9 +18117,45 @@
       "tracking_number": "",
       "package_dimensions": "",
       "package_size": ""
+    },
+    {
+      "id": "19f9296c79dd9e68",
+      "thread_id": "19f9296c79dd9e68",
+      "from": "noreply@postnord.com",
+      "to": "sprylar@gmail.com",
+      "subject": "Ditt inlämningskvitto",
+      "date": "Fri, 24 Jul 2026 05:26:21 +0000 (UTC)",
+      "internal_date": 1784870781000,
+      "snippet": "Specifikation från PostNord Tack för att du använder PostNord. Ditt inlämningskvitto är bifogat som pdf i detta mail. Vänliga hälsningar, PostNord PostNord Sverige AB Momsreg.nr. SE556711569501",
+      "body": "Retail Receipt \r\n \r\n \r\n\r\n \r\n \r\n \r\n \r\n \r\n \r\n \r\n \r\n \r\n \r\n \r\n \r\n \r\n \r\n Specifikation från PostNord\n\r\n\r\n \r\n \r\n \r\n \r\n \n\r\n \r\n \r\n \r\n \n\r\n \r\n \r\n \r\n \r\n \r\n \r\n Tack för att du använder PostNord. \n\r\n Ditt inlämningskvitto är bifogat som pdf i detta mail.\n\r\n Vänliga hälsningar, PostNord\n\r\n \n\r\n \r\n PostNord Sverige AB\n\r\n Momsreg.nr. SE556711569501",
+      "unread": true,
+      "labels": [
+        "UNREAD",
+        "IMPORTANT",
+        "CATEGORY_UPDATES",
+        "INBOX"
+      ],
+      "url": "https://mail.google.com/mail/#all/19f9296c79dd9e68",
+      "order": "",
+      "object_id": "",
+      "buyer": "",
+      "sale_amount": null,
+      "shipping_cost": null,
+      "total_amount": null,
+      "thread_has_reply": false,
+      "latest_message_is_mine": false,
+      "shipment_number": "",
+      "qr_code_data_url": "https://portal.postnord.com/skickadirekt/assets/images/email/postnord-logo-blue.jpg",
+      "shipping_carrier": "PostNord",
+      "shipping_service": "PostNord Tack för att du använder PostNord. Ditt inlämningskvitto är bifogat som pdf i",
+      "shipping_weight": "",
+      "shipping_pickup": "",
+      "tracking_number": "",
+      "package_dimensions": "",
+      "package_size": ""
     }
   ],
-  "last_sync": 1784867529,
+  "last_sync": 1784877238,
   "listings": [
     {
       "id": 740500872,
@@ -18686,7 +18722,7 @@
       "image": "https://img.tradera.net/small-square/461/653096461_79e860d2-b105-4818-9d1c-b805af6146c1.jpg"
     }
   ],
-  "listings_synced_at": 1784867530,
+  "listings_synced_at": 1784877240,
   "item_images": {
     "739720070": "https://img.tradera.net/small-square/750/651725750_ec330ab8-6a4a-41a5-9579-31530c14cb9b.jpg",
     "740203952": "https://img.tradera.net/small-square/773/652085773_68b97a78-b1fe-4d4a-9024-8b4a24a277d9.jpg",
