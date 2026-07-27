@@ -19449,9 +19449,45 @@
       "tracking_number": "",
       "package_dimensions": "",
       "package_size": ""
+    },
+    {
+      "id": "19fa32cda109a32a",
+      "thread_id": "19fa32cda109a32a",
+      "from": "Guldgruvan33 via Tradera <5045467.2f2d2a9decdde7447217101d2ba3cdc21b21ba68@messaging.tradera.com>",
+      "to": "DarioSwede <sprylar@gmail.com>",
+      "subject": "Ang: Escada Taj Sunset Parfym 30 ml. (741530810)",
+      "date": "Mon, 27 Jul 2026 10:44:12 +0000",
+      "internal_date": 1785149052000,
+      "snippet": "Tradera Skapa annons Minneslista Inspiration Du har fått ett nytt meddelande Escada Taj Sunset Parfym 30 ml. Guldgruvan33 Hej! Det är en äkta escada? Inte någon piratkopia ? 27 juli 2026, 12:40 Gå till",
+      "body": "Du har fått ett nytt meddelande.\r\n\r\n\r\nAngående: Escada Taj Sunset Parfym 30 ml. (741530810)\r\nhttps://www.tradera.com/item/741530810\r\n\r\n\r\nFrån: Guldgruvan33 \r\n\r\n\r\nHej! Det är en äkta escada? Inte någon piratkopia ?\r\n\r\nDatum: 27 juli 2026, 12:40\r\n\r\n\r\n\r\nGå till Tradera för att svara eller svara bara på detta mail.\r\n\r\nDet här mailet får du eftersom du är medlem på Tradera.\r\n\r\nBehåll detta i mailet när du svarar [[id:gunus1ujppq4hn184c43]]\r\n\r\n© 2026 Tradera",
+      "unread": true,
+      "labels": [
+        "UNREAD",
+        "IMPORTANT",
+        "CATEGORY_UPDATES",
+        "INBOX"
+      ],
+      "url": "https://mail.google.com/mail/#all/19fa32cda109a32a",
+      "order": "",
+      "object_id": "741530810",
+      "buyer": "",
+      "sale_amount": null,
+      "shipping_cost": null,
+      "total_amount": null,
+      "thread_has_reply": false,
+      "latest_message_is_mine": false,
+      "shipment_number": "",
+      "qr_code_data_url": "https://static.tradera.net/internal/email/icons/40/message.png?v=1",
+      "shipping_carrier": "",
+      "shipping_service": "",
+      "shipping_weight": "",
+      "shipping_pickup": "",
+      "tracking_number": "",
+      "package_dimensions": "",
+      "package_size": ""
     }
   ],
-  "last_sync": 1785141351,
+  "last_sync": 1785153388,
   "listings": [
     {
       "id": 741407292,
@@ -19778,6 +19814,30 @@
       "image": "https://img.tradera.net/small-square/152/653546152_711d6c0c-1195-4a66-82aa-c15200db1395.jpg"
     },
     {
+      "id": 742262160,
+      "title": "Sievi Kängor Peter Pan Grön Storlek 39",
+      "price": 600,
+      "buy_now_price": 0,
+      "bids": 0,
+      "item_type": "Auction",
+      "start_date": "2026-07-27T10:20:37.1340000Z",
+      "end_date": "2026-08-03T16:20:37.0800000Z",
+      "url": "https://www.tradera.com/item/340154/742262160/sievi-kangor-peter-pan-gron-storlek-39",
+      "image": "https://img.tradera.net/small-square/710/653652710_e882284e-817f-42ec-a2aa-8db68a09fa0d.jpg"
+    },
+    {
+      "id": 742264841,
+      "title": "Superdry grön jacka, storlek XXL",
+      "price": 350,
+      "buy_now_price": 0,
+      "bids": 0,
+      "item_type": "Auction",
+      "start_date": "2026-07-27T10:37:02.1170000Z",
+      "end_date": "2026-08-03T16:37:02.0420000Z",
+      "url": "https://www.tradera.com/item/1000695/742264841/superdry-gron-jacka-storlek-xxl",
+      "image": "https://img.tradera.net/small-square/642/653654642_4be76da1-878a-477f-b4b5-bbfe8b26bf4d.jpg"
+    },
+    {
       "id": 742221927,
       "title": "Turkisk Ottoman äldre Chibouk",
       "price": 300,
@@ -19802,7 +19862,7 @@
       "image": "https://img.tradera.net/small-square/802/653621802_69badde9-c986-4d47-976a-f840d2d64058.jpg"
     }
   ],
-  "listings_synced_at": 1785141352,
+  "listings_synced_at": 1785153388,
   "item_images": {
     "739720070": "https://img.tradera.net/small-square/750/651725750_ec330ab8-6a4a-41a5-9579-31530c14cb9b.jpg",
     "740203952": "https://img.tradera.net/small-square/773/652085773_68b97a78-b1fe-4d4a-9024-8b4a24a277d9.jpg",
@@ -19888,7 +19948,9 @@
     "742113759": "https://img.tradera.net/small-square/995/653541995_a5b1483a-5fa5-4222-b565-aeaef34c66c0.jpg",
     "742119079": "https://img.tradera.net/small-square/152/653546152_711d6c0c-1195-4a66-82aa-c15200db1395.jpg",
     "742221927": "https://img.tradera.net/small-square/539/653621539_22ba52b4-f13c-4727-94be-454edade1112.jpg",
-    "742222236": "https://img.tradera.net/small-square/802/653621802_69badde9-c986-4d47-976a-f840d2d64058.jpg"
+    "742222236": "https://img.tradera.net/small-square/802/653621802_69badde9-c986-4d47-976a-f840d2d64058.jpg",
+    "742262160": "https://img.tradera.net/small-square/710/653652710_e882284e-817f-42ec-a2aa-8db68a09fa0d.jpg",
+    "742264841": "https://img.tradera.net/small-square/642/653654642_4be76da1-878a-477f-b4b5-bbfe8b26bf4d.jpg"
   },
   "order_ledger": {
     "150370407": {
