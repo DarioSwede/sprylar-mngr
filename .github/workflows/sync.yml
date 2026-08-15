@@ -2,7 +2,8 @@ name: Synka
 
 on:
   schedule:
-    - cron: "*/5 * * * *"
+    - cron: "0 6,17 * * *"
+      timezone: "Europe/Stockholm"
   workflow_dispatch: {}
 
 permissions:
