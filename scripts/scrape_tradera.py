@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
 """Skrapar säljarens publika Tradera-profil (aktiva annonser: pris, bud, sluttid).
 
-Ingen inloggning behövs — Traderas profilsida är serverrenderad och all
-data för de aktiva annonserna ligger redan i sidans __NEXT_DATA__-JSON,
-under props.pageProps.initialState.discover.items.
+När Tradera tillhandahåller __NEXT_DATA__ läses annonserna från
+props.pageProps.initialState.discover.items.
+
+Om Tradera ändrar eller blockerar profilsidan behålls senast kända
+Tradera-data, så att Gmail-synken ändå kan slutföras.
 
 Miljövariabler (valfria):
   TRADERA_MEMBER_ID (default 5045467)
@@ -40,11 +42,8 @@ def fetch_discover(page: int) -> dict:
 
 
 def fetch_all_items() -> list[dict]:
-    # OBS: Traderas ?page=N-parameter paginerar inte tillförlitligt för den
-    # här profilvyn — den kan returnera samma (eller en omblandad delmängd
-    # av samma) annonser istället för nästa sida. Vi dedupar därför på
-    # itemId medan vi hämtar, så att sådana överlapp aldrig ger dubbletter
-    # i store.json.
+    # Traderas ?page=N kan returnera överlappande annonser.
+    # Deduplikera därför på itemId.
     discover = fetch_discover(1)
     items = list(discover.get("items") or [])
     seen = {it.get("itemId") for it in items}
@@ -74,8 +73,13 @@ def simplify(item: dict) -> dict:
     }
 
 
-def main():
-    items = fetch_all_items()
+def main() -> int:
+    try:
+        items = fetch_all_items()
+    except Exception as exc:
+        print(f"Varning: Tradera kunde inte läsas ({exc}). Behåller senast sparade Tradera-data.")
+        return 0
+
     by_id = {}
     for it in (simplify(i) for i in items):
         by_id[it["id"]] = it
@@ -88,8 +92,7 @@ def main():
         except Exception:
             store = {}
 
-    # Bilder sparas permanent per objekt-id, så miniatyren finns kvar även
-    # efter att varan sålts och försvunnit från de aktiva annonserna.
+    # Bilder sparas permanent per objekt-id.
     images = store.get("item_images", {})
     for it in listings:
         if it["image"]:
@@ -102,6 +105,7 @@ def main():
     STORE.parent.mkdir(parents=True, exist_ok=True)
     STORE.write_text(json.dumps(store, ensure_ascii=False, indent=2), encoding="utf-8")
     print(f"Klart: {len(listings)} aktiva annonser sparade i store.json.")
+    return 0
 
 
 if __name__ == "__main__":
